@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>2026년 하반기 경남사립학교장회 정기총회 출석체크</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F1E5;
+    --card:#FFFFFF;
+    --ink:#1E2A44;
+    --ink-2:#4C5A78;
+    --brass:#A5822E;
+    --brass-dark:#7E6423;
+    --line:#E2DAC5;
+    --success:#2F6B4F;
+    --success-bg:#EAF3EE;
+    --warn:#8C4A33;
+    --warn-bg:#F6EBE5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:'Noto Sans KR', -apple-system, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 60px;
+  }
+  .sheet{
+    width:100%;
+    max-width:460px;
+  }
+  .crest{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .crest .org{
+    font-size:14px;
+    color:var(--ink-2);
+    letter-spacing:0.02em;
+    margin-bottom:6px;
+  }
+  .crest h1{
+    font-family:'Noto Serif KR', serif;
+    font-weight:700;
+    font-size:24px;
+    line-height:1.4;
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  .crest .meta{
+    font-size:13px;
+    color:var(--ink-2);
+  }
+  .goldline{
+    height:3px;
+    width:56px;
+    background:var(--brass);
+    margin:14px auto 0;
+    border-radius:2px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 20px 24px;
+    margin-top:22px;
+    box-shadow:0 1px 0 rgba(30,42,68,0.03);
+  }
+  #home-view .card{ min-height: 320px; }
+  .search-wrap{ position:relative; }
+  #searchInput{
+    width:100%;
+    font-family:inherit;
+    font-size:18px;
+    padding:16px 16px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    outline:none;
+    background:#FCFAF4;
+    color:var(--ink);
+  }
+  #searchInput:focus{ border-color:var(--brass); background:#fff; }
+  .hint{
+    font-size:13px;
+    color:var(--ink-2);
+    margin-top:10px;
+    text-align:center;
+  }
+  .chips{
+    display:flex;
+    gap:8px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    font-size:14px;
+    padding:8px 14px;
+    border-radius:20px;
+    border:1.3px solid var(--line);
+    background:#FCFAF4;
+    color:var(--ink-2);
+    cursor:pointer;
+    user-select:none;
+  }
+  .chip.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fff;
+  }
+  .results{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:360px;
+    overflow-y:auto;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:14px 14px;
+    border:1.3px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+    background:#FEFDFA;
+  }
+  .row:active{ background:#F6EFDB; }
+  .row .who{ display:flex; flex-direction:column; gap:2px; }
+  .row .school{ font-weight:700; font-size:16px; color:var(--ink); }
+  .row .name{ font-size:14px; color:var(--ink-2); }
+  .tag{
+    font-size:11.5px;
+    padding:4px 8px;
+    border-radius:6px;
+    background:#EFE9D6;
+    color:var(--brass-dark);
+    white-space:nowrap;
+    font-weight:700;
+  }
+  .row.done{ opacity:0.55; }
+  .row.done .tag{ background:var(--success-bg); color:var(--success); }
+  .empty{
+    text-align:center;
+    color:var(--ink-2);
+    font-size:14px;
+    padding:30px 10px;
+  }
+  .helpline{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--ink-2);
+    margin-top:22px;
+    line-height:1.6;
+  }
+  .adminlink{
+    display:block;
+    text-align:center;
+    font-size:12px;
+    color:#B9AF95;
+    margin-top:10px;
+    text-decoration:none;
+  }
+
+  /* confirm / result views */
+  .center-view{ display:none; text-align:center; }
+  .center-view .card{ padding:36px 24px 30px; }
+  .big-school{
+    font-family:'Noto Serif KR', serif;
+    font-size:22px;
+    font-weight:700;
+    margin:4px 0 2px;
+  }
+  .big-name{
+    font-size:17px;
+    color:var(--ink-2);
+    margin-bottom:22px;
+  }
+  .confirm-q{ font-size:15px; color:var(--ink-2); margin-bottom:20px; }
+  .btnrow{ display:flex; gap:10px; }
+  button.primary, button.secondary{
+    flex:1;
+    font-family:inherit;
+    font-size:16px;
+    font-weight:700;
+    padding:15px 10px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+  }
+  button.primary{ background:var(--ink); color:#fff; }
+  button.secondary{ background:#F0EBDA; color:var(--ink-2); }
+  .icon-wrap{
+    width:64px; height:64px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 18px;
+  }
+  .icon-wrap.ok{ background:var(--success-bg); }
+  .icon-wrap.warn{ background:var(--warn-bg); }
+  .status-line{ font-size:19px; font-weight:700; margin-bottom:4px; }
+  .status-line.ok{ color:var(--success); }
+  .status-line.warn{ color:var(--warn); }
+  .time-line{ font-size:13.5px; color:var(--ink-2); margin-bottom:26px; }
+  button.wide{
+    width:100%;
+    font-family:inherit;
+    font-size:16px;
+    font-weight:700;
+    padding:15px 10px;
+    border-radius:10px;
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+  }
+
+  /* admin view */
+  #admin-view{ display:none; }
+  .stat-grid{ display:flex; gap:10px; margin-bottom:16px; }
+  .stat-box{
+    flex:1;
+    background:#FCFAF4;
+    border:1.3px solid var(--line);
+    border-radius:10px;
+    padding:14px 10px;
+    text-align:center;
+  }
+  .stat-box .num{ font-size:24px; font-weight:900; color:var(--ink); }
+  .stat-box .lbl{ font-size:12px; color:var(--ink-2); margin-top:2px; }
+  .progress-outer{
+    height:10px; background:#EFE9D6; border-radius:6px; overflow:hidden; margin-bottom:18px;
+  }
+  .progress-inner{ height:100%; background:var(--brass); width:0%; transition:width .3s; }
+  .admin-table{ max-height:420px; overflow-y:auto; }
+  .admin-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 4px; border-bottom:1px solid var(--line); font-size:13.5px;
+  }
+  .admin-row .l{ color:var(--ink); font-weight:600; }
+  .admin-row .r{ color:var(--ink-2); font-size:12px; }
+  .admin-row.checked .r{ color:var(--success); font-weight:700; }
+  .admin-actions{ display:flex; gap:8px; margin-top:14px; }
+  .admin-actions button{
+    flex:1; padding:10px; border-radius:8px; border:1.3px solid var(--line);
+    background:#FCFAF4; font-family:inherit; font-size:13px; cursor:pointer; color:var(--ink-2);
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <div id="home-view">
+    <div class="crest">
+      <div class="org">경남사립학교장회</div>
+      <h1>2026년 하반기 정기총회<br>출석 확인</h1>
+      <div class="meta">일시·장소는 안내문을 확인해 주세요</div>
+      <div class="goldline"></div>
+    </div>
+
+    <div class="card">
+      <div class="search-wrap">
+        <input id="searchInput" type="text" placeholder="학교명 또는 성함을 입력해 주세요" autocomplete="off">
+      </div>
+      <div class="hint">예) 거제고등학교 또는 김회진</div>
+      <div class="chips">
+        <div class="chip active" data-level="전체">전체</div>
+        <div class="chip" data-level="초등학교">초등학교</div>
+        <div class="chip" data-level="중학교">중학교</div>
+        <div class="chip" data-level="고등학교">고등학교</div>
+        <div class="chip" data-level="특수학교">특수학교</div>
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+
+    <div class="helpline">
+      검색이 어려우시면 등록 데스크 직원에게<br>말씀해 주시면 대신 도와드립니다.
+    </div>
+    <a class="adminlink" href="#" id="openAdmin">진행 현황</a>
+  </div>
+
+  <div id="confirm-view" class="center-view">
+    <div class="card">
+      <div class="confirm-q">아래 정보가 맞는지 확인해 주세요</div>
+      <div class="big-school" id="cf-school"></div>
+      <div class="big-name" id="cf-name"></div>
+      <div class="btnrow">
+        <button class="secondary" id="cf-cancel">다시 찾기</button>
+        <button class="primary" id="cf-ok">네, 출석합니다</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-view" class="center-view">
+    <div class="card">
+      <div class="icon-wrap" id="rv-icon"></div>
+      <div class="status-line" id="rv-status"></div>
+      <div class="big-school" id="rv-school"></div>
+      <div class="big-name" id="rv-name"></div>
+      <div class="time-line" id="rv-time"></div>
+      <button class="wide" id="rv-close">확인</button>
+    </div>
+  </div>
+
+  <div id="admin-view">
+    <div class="crest">
+      <div class="org">경남사립학교장회</div>
+      <h1 style="font-size:20px;">진행 현황</h1>
+      <div class="goldline"></div>
+    </div>
+    <div class="card">
+      <div style="text-align:center;font-size:13px;color:var(--ink-2);margin-bottom:14px;">
+        현재 진행 중인 행사: <strong id="currentEventName">-</strong>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="num" id="st-total">-</div><div class="lbl">전체 회원교</div></div>
+        <div class="stat-box"><div class="num" id="st-done">-</div><div class="lbl">출석 완료</div></div>
+        <div class="stat-box"><div class="num" id="st-pct">-</div><div class="lbl">출석률</div></div>
+      </div>
+      <div class="progress-outer"><div class="progress-inner" id="progressBar"></div></div>
+      <input id="adminSearch" type="text" placeholder="학교명·성함 검색" style="width:100%;padding:10px;border-radius:8px;border:1.3px solid var(--line);font-family:inherit;font-size:14px;margin-bottom:10px;">
+      <div class="admin-table" id="adminTable"></div>
+      <div class="admin-actions">
+        <button id="adminRefresh">새로고침</button>
+        <button id="adminCopy">출석자 명단 복사</button>
+        <button id="adminCsv">CSV 다운로드</button>
+      </div>
+      <div class="admin-actions" style="margin-top:8px;">
+        <button id="adminNewEvent" style="color:var(--warn);border-color:var(--warn-bg);">새 행사 시작</button>
+        <button id="adminClose">닫기</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ▼▼▼ 배포한 구글 앱스 스크립트 웹앱 URL을 여기에 붙여넣으세요 ▼▼▼
+const GAS_URL = 'https://script.google.com/macros/library/d/1Cv1ns7T7mmXsyNRaiIjEumSDmzE-QKQRD9ZGhvPmJDeXL1QDQWX3imvG/1';
+// ▲▲▲ 예: https://script.google.com/macros/s/AKfycb.../exec ▲▲▲
+
+const SCHOOLS = [{"no": 1, "region": "합천", "level": "중학교", "school": "가회중학교", "name": "박정포"}, {"no": 2, "region": "산청", "level": "고등학교", "school": "간디고등학교", "name": "정미숙"}, {"no": 3, "region": "양산", "level": "중학교", "school": "개운중학교", "name": "도태준"}, {"no": 4, "region": "거제", "level": "고등학교", "school": "거제고등학교", "name": "김회진"}, {"no": 5, "region": "거제", "level": "특수학교", "school": "거제애광학교", "name": "조현관"}, {"no": 6, "region": "거제", "level": "중학교", "school": "거제중학교", "name": "옥경수"}, {"no": 7, "region": "거창", "level": "고등학교", "school": "거창고등학교", "name": "김예진"}, {"no": 8, "region": "거창", "level": "고등학교", "school": "거창대성고등학교", "name": "박상규"}, {"no": 9, "region": "거창", "level": "중학교", "school": "거창대성중학교", "name": "노상신"}, {"no": 10, "region": "거창", "level": "고등학교", "school": "거창중앙고등학교", "name": "한성환"}, {"no": 11, "region": "산청", "level": "고등학교", "school": "경남간호고등학교", "name": "공윤식"}, {"no": 12, "region": "창원", "level": "고등학교", "school": "경남관광고등학교", "name": "조태제"}, {"no": 13, "region": "함안", "level": "고등학교", "school": "경남로봇고등학교", "name": "박병기"}, {"no": 14, "region": "창원", "level": "고등학교", "school": "경남미용고등학교", "name": "서연수"}, {"no": 15, "region": "진주", "level": "고등학교", "school": "경남예술고등학교", "name": "심재화"}, {"no": 16, "region": "양산", "level": "고등학교", "school": "경남외국어고등학교", "name": "이상환"}, {"no": 17, "region": "진주", "level": "고등학교", "school": "경남자동차고등학교", "name": "하재웅"}, {"no": 18, "region": "창원", "level": "고등학교", "school": "경남전자고등학교", "name": "김영목"}, {"no": 19, "region": "창원", "level": "고등학교", "school": "경상고등학교", "name": "김미경"}, {"no": 20, "region": "진주", "level": "고등학교", "school": "경진고등학교", "name": "황일환"}, {"no": 21, "region": "진주", "level": "고등학교", "school": "경해여자고등학교", "name": "김진하"}, {"no": 22, "region": "진주", "level": "중학교", "school": "경해여자중학교", "name": "김혜경"}, {"no": 23, "region": "고성", "level": "고등학교", "school": "고성고등학교", "name": "김병수"}, {"no": 24, "region": "사천", "level": "중학교", "school": "곤명중학교", "name": "강태현"}, {"no": 25, "region": "함안", "level": "고등학교", "school": "군북고등학교", "name": "오정혜"}, {"no": 26, "region": "함안", "level": "중학교", "school": "군북중학교", "name": "강종철"}, {"no": 27, "region": "김해", "level": "고등학교", "school": "김해중앙여자고등학교", "name": "강선혜"}, {"no": 28, "region": "김해", "level": "중학교", "school": "김해중앙여자중학교", "name": "변영수"}, {"no": 29, "region": "김해", "level": "고등학교", "school": "김해한일여자고등학교", "name": "이연지"}, {"no": 30, "region": "사천", "level": "중학교", "school": "남양중학교", "name": "한양희"}, {"no": 31, "region": "창녕", "level": "고등학교", "school": "남지고등학교", "name": "정대열"}, {"no": 32, "region": "창녕", "level": "중학교", "school": "남지여자중학교", "name": "신종만"}, {"no": 33, "region": "창녕", "level": "중학교", "school": "남지중학교", "name": "김병동"}, {"no": 34, "region": "남해", "level": "고등학교", "school": "남해고등학교", "name": "김보경"}, {"no": 35, "region": "남해", "level": "고등학교", "school": "남해해성고등학교", "name": "김동진"}, {"no": 36, "region": "합천", "level": "중학교", "school": "대병중학교", "name": "제종준"}, {"no": 37, "region": "함안", "level": "중학교", "school": "대산중학교", "name": "이윤아"}, {"no": 38, "region": "거창", "level": "고등학교", "school": "대성일고등학교", "name": "정현종"}, {"no": 39, "region": "창녕", "level": "중학교", "school": "대성중학교", "name": "윤정호"}, {"no": 40, "region": "진주", "level": "고등학교", "school": "대아고등학교", "name": "정규석"}, {"no": 41, "region": "진주", "level": "중학교", "school": "대아중학교", "name": "이정훈"}, {"no": 42, "region": "거제", "level": "초등학교", "school": "대우초등학교", "name": "반정옥"}, {"no": 43, "region": "밀양", "level": "중학교", "school": "동국대사대부속홍제중학교", "name": "강호숙"}, {"no": 44, "region": "밀양", "level": "중학교", "school": "동명중학교", "name": "권철혁"}, {"no": 45, "region": "통영", "level": "고등학교", "school": "동원고등학교", "name": "임도헌"}, {"no": 46, "region": "통영", "level": "중학교", "school": "동원중학교", "name": "홍지연"}, {"no": 47, "region": "거제", "level": "중학교", "school": "둔덕중학교", "name": "남창경"}, {"no": 48, "region": "창원", "level": "고등학교", "school": "마산공업고등학교", "name": "박옥수"}, {"no": 49, "region": "창원", "level": "고등학교", "school": "마산무학여자고등학교", "name": "이명숙"}, {"no": 50, "region": "창원", "level": "중학교", "school": "마산무학여자중학교", "name": "류승수"}, {"no": 51, "region": "창원", "level": "고등학교", "school": "마산삼진고등학교", "name": "이미영"}, {"no": 52, "region": "창원", "level": "중학교", "school": "마산삼진중학교", "name": "조호제"}, {"no": 53, "region": "창원", "level": "고등학교", "school": "마산제일고등학교", "name": "이석재"}, {"no": 54, "region": "창원", "level": "고등학교", "school": "마산제일여자고등학교", "name": "배종선"}, {"no": 55, "region": "창원", "level": "중학교", "school": "마산제일여자중학교", "name": "안미경"}, {"no": 56, "region": "창원", "level": "고등학교", "school": "마산중앙고등학교", "name": "김성두"}, {"no": 57, "region": "창원", "level": "중학교", "school": "마산중앙중학교", "name": "김소영"}, {"no": 58, "region": "함안", "level": "고등학교", "school": "명덕고등학교", "name": "차미라"}, {"no": 59, "region": "합천", "level": "중학교", "school": "묘산중학교", "name": "곽명희"}, {"no": 60, "region": "양산", "level": "중학교", "school": "물금동아중학교", "name": "정지훈"}, {"no": 61, "region": "밀양", "level": "고등학교", "school": "밀성고등학교", "name": "황인주"}, {"no": 62, "region": "밀양", "level": "중학교", "school": "밀성여자중학교", "name": "이영민"}, {"no": 63, "region": "밀양", "level": "고등학교", "school": "밀성제일고등학교", "name": "고명진"}, {"no": 64, "region": "밀양", "level": "중학교", "school": "밀성중학교", "name": "최인길"}, {"no": 65, "region": "밀양", "level": "중학교", "school": "밀양동강중학교", "name": "박영진"}, {"no": 66, "region": "밀양", "level": "고등학교", "school": "밀양동명고등학교", "name": "금선화"}, {"no": 67, "region": "양산", "level": "고등학교", "school": "보광고등학교", "name": "신용수"}, {"no": 68, "region": "양산", "level": "중학교", "school": "보광중학교", "name": "이규성"}, {"no": 69, "region": "사천", "level": "고등학교", "school": "사천고등학교", "name": "송일승"}, {"no": 70, "region": "사천", "level": "고등학교", "school": "사천여자고등학교", "name": "전경원"}, {"no": 71, "region": "밀양", "level": "고등학교", "school": "삼랑진고등학교", "name": "장혜진"}, {"no": 72, "region": "밀양", "level": "중학교", "school": "삼랑진중학교", "name": "문경난"}, {"no": 73, "region": "사천", "level": "고등학교", "school": "삼천포고등학교", "name": "서영희"}, {"no": 74, "region": "사천", "level": "고등학교", "school": "삼천포여자고등학교", "name": "이임섭"}, {"no": 75, "region": "사천", "level": "중학교", "school": "삼천포여자중학교", "name": "전협배"}, {"no": 76, "region": "사천", "level": "중학교", "school": "삼천포중학교", "name": "김태원"}, {"no": 77, "region": "진주", "level": "고등학교", "school": "삼현여자고등학교", "name": "김형곤"}, {"no": 78, "region": "진주", "level": "중학교", "school": "삼현여자중학교", "name": "조영주"}, {"no": 79, "region": "남해", "level": "중학교", "school": "상주중학교", "name": "김봉겸"}, {"no": 80, "region": "거창", "level": "중학교", "school": "샛별중학교", "name": "김기호(직)"}, {"no": 81, "region": "거창", "level": "초등학교", "school": "샛별초등학교", "name": "전기환"}, {"no": 82, "region": "진주", "level": "고등학교", "school": "선명여자고등학교", "name": "주영규"}, {"no": 83, "region": "진주", "level": "중학교", "school": "선인국제중학교", "name": "박상욱"}, {"no": 84, "region": "창녕", "level": "중학교", "school": "성산중학교", "name": "심영보"}, {"no": 85, "region": "창원", "level": "고등학교", "school": "성지여자고등학교", "name": "문병훈"}, {"no": 86, "region": "창원", "level": "중학교", "school": "성지여자중학교", "name": "김우철"}, {"no": 87, "region": "밀양", "level": "고등학교", "school": "세종고등학교", "name": "박진제"}, {"no": 88, "region": "밀양", "level": "중학교", "school": "세종중학교", "name": "김종섭"}, {"no": 89, "region": "창녕", "level": "중학교", "school": "신창여자중학교", "name": "정순영"}, {"no": 90, "region": "함양", "level": "중학교", "school": "안의중학교", "name": "안정덕"}, {"no": 91, "region": "양산", "level": "고등학교", "school": "양산여자고등학교", "name": "김형수"}, {"no": 92, "region": "양산", "level": "중학교", "school": "양산여자중학교", "name": "서동권"}, {"no": 93, "region": "양산", "level": "고등학교", "school": "양산제일고등학교", "name": "김효진"}, {"no": 94, "region": "거제", "level": "중학교", "school": "외포중학교", "name": "신부선"}, {"no": 95, "region": "사천", "level": "고등학교", "school": "용남고등학교", "name": "최연진"}, {"no": 96, "region": "사천", "level": "중학교", "school": "용남중학교", "name": "신현숙"}, {"no": 97, "region": "창원", "level": "중학교", "school": "웅동중학교", "name": "박성완"}, {"no": 98, "region": "의령", "level": "고등학교", "school": "의령여자고등학교", "name": "이성진"}, {"no": 99, "region": "의령", "level": "중학교", "school": "의령여자중학교", "name": "김영미"}, {"no": 100, "region": "창원", "level": "중학교", "school": "의신중학교", "name": "배용근"}, {"no": 101, "region": "남해", "level": "중학교", "school": "이동중학교", "name": "윤창수"}, {"no": 102, "region": "거제", "level": "중학교", "school": "장목예술중학교", "name": "박상욱"}, {"no": 103, "region": "김해", "level": "중학교", "school": "장유중학교", "name": "한숙희"}, {"no": 104, "region": "의령", "level": "중학교", "school": "정곡중학교", "name": "강훈구"}, {"no": 105, "region": "산청", "level": "고등학교", "school": "지리산고등학교", "name": "박영출"}, {"no": 106, "region": "의령", "level": "중학교", "school": "지정중학교", "name": "박주연"}, {"no": 107, "region": "김해", "level": "중학교", "school": "진례중학교", "name": "전주현"}, {"no": 108, "region": "진주", "level": "고등학교", "school": "진주동명고등학교", "name": "양판석"}, {"no": 109, "region": "진주", "level": "중학교", "school": "진주동명중학교", "name": "최용준"}, {"no": 110, "region": "진주", "level": "중학교", "school": "진주동중학교", "name": "김종섭"}, {"no": 111, "region": "진주", "level": "고등학교", "school": "진주외국어고등학교", "name": "최문근"}, {"no": 112, "region": "진주", "level": "고등학교", "school": "진주제일여자고등학교", "name": "손광락"}, {"no": 113, "region": "창원", "level": "중학교", "school": "진해남중학교", "name": "김태형"}, {"no": 114, "region": "창원", "level": "고등학교", "school": "진해세화여자고등학교", "name": "이진희"}, {"no": 115, "region": "창원", "level": "고등학교", "school": "진해중앙고등학교", "name": "정성두(직)"}, {"no": 116, "region": "창녕", "level": "고등학교", "school": "창녕고등학교", "name": "이성원"}, {"no": 117, "region": "창녕", "level": "고등학교", "school": "창녕대성고등학교", "name": "윤정호"}, {"no": 118, "region": "창녕", "level": "고등학교", "school": "창녕여자고등학교", "name": "하태욱"}, {"no": 119, "region": "창녕", "level": "중학교", "school": "창녕여자중학교", "name": "박형진"}, {"no": 120, "region": "창녕", "level": "고등학교", "school": "창녕옥야고등학교", "name": "윤종민"}, {"no": 121, "region": "창녕", "level": "중학교", "school": "창녕옥야중학교", "name": "황태현"}, {"no": 122, "region": "남해", "level": "고등학교", "school": "창선고등학교", "name": "한창호"}, {"no": 123, "region": "남해", "level": "중학교", "school": "창선중학교", "name": "박상일"}, {"no": 124, "region": "창원", "level": "고등학교", "school": "창신고등학교", "name": "이상진"}, {"no": 125, "region": "창원", "level": "중학교", "school": "창신중학교", "name": "강정묵"}, {"no": 126, "region": "창원", "level": "고등학교", "school": "창원경일고등학교", "name": "변창우"}, {"no": 127, "region": "창원", "level": "고등학교", "school": "창원경일여자고등학교", "name": "진성일"}, {"no": 128, "region": "창원", "level": "고등학교", "school": "창원고등학교", "name": "장명득"}, {"no": 129, "region": "창원", "level": "고등학교", "school": "창원공업고등학교", "name": "박상권"}, {"no": 130, "region": "창원", "level": "고등학교", "school": "창원남고등학교", "name": "김신철"}, {"no": 131, "region": "창원", "level": "중학교", "school": "창원남중학교", "name": "윤정수"}, {"no": 132, "region": "창원", "level": "고등학교", "school": "창원대산고등학교", "name": "서정규"}, {"no": 133, "region": "창원", "level": "중학교", "school": "창원대산중학교", "name": "최갑열"}, {"no": 134, "region": "창원", "level": "특수학교", "school": "창원동백학교", "name": "이금주"}, {"no": 135, "region": "창원", "level": "고등학교", "school": "창원문성고등학교", "name": "정재운"}, {"no": 136, "region": "창원", "level": "고등학교", "school": "창원성민여자고등학교", "name": "이진기(직)"}, {"no": 137, "region": "창원", "level": "중학교", "school": "창원여자중학교", "name": "양승문"}, {"no": 138, "region": "창원", "level": "중학교", "school": "창원중학교", "name": "김선희"}, {"no": 139, "region": "고성", "level": "고등학교", "school": "철성고등학교", "name": "송영기"}, {"no": 140, "region": "고성", "level": "중학교", "school": "철성중학교", "name": "김승자(직)"}, {"no": 141, "region": "통영", "level": "고등학교", "school": "충렬여자고등학교", "name": "최종렬"}, {"no": 142, "region": "통영", "level": "중학교", "school": "충렬여자중학교", "name": "강동훈"}, {"no": 143, "region": "함안", "level": "중학교", "school": "칠성중학교", "name": "권희주"}, {"no": 144, "region": "함안", "level": "고등학교", "school": "칠원고등학교", "name": "송현정"}, {"no": 145, "region": "함안", "level": "중학교", "school": "칠원중학교", "name": "정명애"}, {"no": 146, "region": "하동", "level": "고등학교", "school": "하동여자고등학교", "name": "오준영"}, {"no": 147, "region": "하동", "level": "중학교", "school": "하동중학교", "name": "류용만"}, {"no": 148, "region": "창녕", "level": "고등학교", "school": "한국과학기술고등학교", "name": "이종현"}, {"no": 149, "region": "김해", "level": "중학교", "school": "한림중학교", "name": "이명진"}, {"no": 150, "region": "창원", "level": "고등학교", "school": "한일여자고등학교", "name": "박항신"}, {"no": 151, "region": "함안", "level": "중학교", "school": "함성중학교", "name": "이복순"}, {"no": 152, "region": "함안", "level": "중학교", "school": "함안여자중학교", "name": "윤상보"}, {"no": 153, "region": "합천", "level": "고등학교", "school": "합천여자고등학교", "name": "문용섭"}, {"no": 154, "region": "합천", "level": "중학교", "school": "합천여자중학교", "name": "정재우"}, {"no": 155, "region": "합천", "level": "고등학교", "school": "합천평화고등학교", "name": "이미경"}, {"no": 156, "region": "거제", "level": "고등학교", "school": "해성고등학교", "name": "최오석"}, {"no": 157, "region": "거제", "level": "중학교", "school": "해성중학교(거제)", "name": "이미경"}, {"no": 158, "region": "남해", "level": "중학교", "school": "해성중학교(남해)", "name": "백종기"}, {"no": 159, "region": "합천", "level": "중학교", "school": "해인중학교", "name": "이호재"}, {"no": 160, "region": "거창", "level": "중학교", "school": "혜성여자중학교", "name": "이홍남"}, {"no": 161, "region": "양산", "level": "고등학교", "school": "효암고등학교", "name": "김순남"}];
+
+const els = {
+  home: document.getElementById('home-view'),
+  confirm: document.getElementById('confirm-view'),
+  result: document.getElementById('result-view'),
+  admin: document.getElementById('admin-view'),
+  search: document.getElementById('searchInput'),
+  results: document.getElementById('results'),
+  chips: document.querySelectorAll('.chip'),
+};
+
+let activeLevel = '전체';
+let pending = null;
+let checkedCache = {}; // no -> record, refreshed on demand
+
+function norm(s){ return (s||'').toLowerCase().replace(/\s+/g,''); }
+
+async function isChecked(no){
+  try{
+    const res = await fetch(`${GAS_URL}?action=check&no=${no}`);
+    const data = await res.json();
+    return data.checked ? data.record : null;
+  }catch(e){
+    console.error(e);
+    return null;
+  }
+}
+
+async function renderResults(){
+  const q = norm(els.search.value);
+  let list = SCHOOLS.filter(s => activeLevel==='전체' || s.level===activeLevel);
+  if(q){
+    list = list.filter(s => norm(s.school).includes(q) || norm(s.name).includes(q));
+  }
+  if(!q && activeLevel==='전체'){
+    els.results.innerHTML = '<div class="empty">학교명 또는 성함을 입력하시면<br>목록이 나타납니다.</div>';
+    return;
+  }
+  list = list.slice(0,30);
+  if(list.length===0){
+    els.results.innerHTML = '<div class="empty">검색 결과가 없습니다.</div>';
+    return;
+  }
+  els.results.innerHTML = '';
+  for(const s of list){
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="who">
+        <div class="school">${s.school}</div>
+        <div class="name">${s.name} 교장선생님 · ${s.region}</div>
+      </div>
+      <div class="tag">${s.level.replace('학교','')}</div>
+    `;
+    row.addEventListener('click', ()=> openConfirm(s));
+    els.results.appendChild(row);
+  }
+}
+
+function showView(name){
+  els.home.style.display = name==='home' ? 'block' : 'none';
+  els.confirm.style.display = name==='confirm' ? 'block' : 'none';
+  els.result.style.display = name==='result' ? 'block' : 'none';
+  els.admin.style.display = name==='admin' ? 'block' : 'none';
+}
+
+function openConfirm(school){
+  pending = school;
+  document.getElementById('cf-school').textContent = school.school;
+  document.getElementById('cf-name').textContent = school.name + ' 교장선생님';
+  showView('confirm');
+}
+
+document.getElementById('cf-cancel').addEventListener('click', ()=>{
+  showView('home');
+});
+
+document.getElementById('cf-ok').addEventListener('click', async ()=>{
+  if(!pending) return;
+  document.getElementById('cf-ok').disabled = true;
+  let data;
+  try{
+    const res = await fetch(GAS_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'checkin', no:pending.no, school:pending.school, name:pending.name, level:pending.level, region:pending.region })
+    });
+    data = await res.json();
+  }catch(e){
+    document.getElementById('cf-ok').disabled = false;
+    alert('네트워크 오류로 저장하지 못했습니다. 와이파이 연결을 확인하고 다시 눌러주세요.');
+    return;
+  }
+  document.getElementById('cf-ok').disabled = false;
+  if(data.status === 'duplicate'){
+    document.getElementById('rv-icon').className = 'icon-wrap warn';
+    document.getElementById('rv-icon').innerHTML = warnSvg();
+    document.getElementById('rv-status').className = 'status-line warn';
+    document.getElementById('rv-status').textContent = '이미 출석 확인되었습니다';
+    document.getElementById('rv-school').textContent = pending.school;
+    document.getElementById('rv-name').textContent = pending.name + ' 교장선생님';
+    document.getElementById('rv-time').textContent = data.time + '에 확인됨';
+    showView('result');
+    return;
+  }
+  if(data.status === 'new'){
+    document.getElementById('rv-icon').className = 'icon-wrap ok';
+    document.getElementById('rv-icon').innerHTML = okSvg();
+    document.getElementById('rv-status').className = 'status-line ok';
+    document.getElementById('rv-status').textContent = '출석이 확인되었습니다';
+    document.getElementById('rv-school').textContent = pending.school;
+    document.getElementById('rv-name').textContent = pending.name + ' 교장선생님';
+    document.getElementById('rv-time').textContent = data.time + ' 접수';
+    showView('result');
+    return;
+  }
+  alert('저장 중 오류가 발생했습니다. 다시 시도해 주세요.');
+});
+
+document.getElementById('rv-close').addEventListener('click', ()=>{
+  els.search.value = '';
+  pending = null;
+  renderResults();
+  showView('home');
+});
+
+function okSvg(){
+  return `<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#2F6B4F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function warnSvg(){
+  return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 8.5V13" stroke="#8C4A33" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="16.3" r="1.3" fill="#8C4A33"/></svg>`;
+}
+
+els.search.addEventListener('input', renderResults);
+els.chips.forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    els.chips.forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    activeLevel = chip.dataset.level;
+    renderResults();
+  });
+});
+
+// ---- Admin ----
+document.getElementById('openAdmin').addEventListener('click', async (e)=>{
+  e.preventDefault();
+  const pin = prompt('관리자 PIN을 입력해 주세요');
+  if(pin !== '2026'){
+    if(pin!==null) alert('PIN이 올바르지 않습니다.');
+    return;
+  }
+  showView('admin');
+  await loadCurrentEventName();
+  await loadAdmin();
+});
+document.getElementById('adminClose').addEventListener('click', ()=> showView('home'));
+document.getElementById('adminRefresh').addEventListener('click', loadAdmin);
+document.getElementById('adminSearch').addEventListener('input', renderAdminTable);
+document.getElementById('adminCopy').addEventListener('click', copyAttendeeList);
+document.getElementById('adminCsv').addEventListener('click', downloadCsv);
+document.getElementById('adminNewEvent').addEventListener('click', startNewEventFlow);
+
+async function startNewEventFlow(){
+  const ok = confirm('새 행사를 시작하면 지금부터의 체크인은 새 시트에 쌓이고, 기존 출석 현황 화면은 0명으로 초기화됩니다.\\n지난 행사 기록은 구글시트에 그대로 남아있으니 걱정하지 않으셔도 됩니다.\\n계속하시겠습니까?');
+  if(!ok) return;
+  const name = prompt('이번 행사 이름을 입력해 주세요', '2026년 하반기 정기총회');
+  if(!name) return;
+  try{
+    const res = await fetch(GAS_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'newEvent', name })
+    });
+    const data = await res.json();
+    if(data.status === 'ok'){
+      alert('"' + data.event + '" 행사가 시작되었습니다.');
+      await loadCurrentEventName();
+      await loadAdmin();
+    } else {
+      alert('행사 시작에 실패했습니다. 다시 시도해 주세요.');
+    }
+  }catch(e){
+    alert('네트워크 오류로 행사를 시작하지 못했습니다.');
+  }
+}
+
+async function loadCurrentEventName(){
+  try{
+    const res = await fetch(`${GAS_URL}?action=currentEvent`);
+    const data = await res.json();
+    document.getElementById('currentEventName').textContent = data.event || '-';
+  }catch(e){
+    document.getElementById('currentEventName').textContent = '(불러오기 실패)';
+  }
+}
+
+function copyAttendeeList(){
+  const attendees = adminData.filter(r=>r.checked)
+    .sort((a,b)=> (a.time||'').localeCompare(b.time||''));
+  if(attendees.length===0){ alert('아직 출석한 학교가 없습니다.'); return; }
+  const lines = attendees.map((r,i)=> `${i+1}. ${r.school} ${r.name} 교장선생님 - ${r.time} 출석`);
+  const text = `[출석 확인 명단] 총 ${attendees.length}명\\n` + lines.join('\\n');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      ()=> alert('출석자 명단이 복사되었습니다. 메모장이나 문서에 붙여넣기 하세요.'),
+      ()=> promptFallback(text)
+    );
+  } else {
+    promptFallback(text);
+  }
+}
+
+function promptFallback(text){
+  window.prompt('아래 내용을 직접 선택해 복사해 주세요 (Ctrl+C / Cmd+C)', text);
+}
+
+function downloadCsv(){
+  if(adminData.length===0){ alert('데이터를 먼저 불러와 주세요.'); return; }
+  const header = ['연번','지역','학교급','교명','성명','출석여부','출석시각'];
+  const rows = [...adminData].sort((a,b)=> a.no-b.no).map(r=>[
+    r.no, r.region, r.level, r.school, r.name, r.checked? '출석':'미확인', r.time||''
+  ]);
+  const csv = [header, ...rows].map(row =>
+    row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+  ).join('\\r\\n');
+  const blob = new Blob(['\\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const today = new Date();
+  const ymd = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
+  a.href = url;
+  a.download = `정기총회_출석현황_${ymd}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+let adminData = [];
+
+async function loadAdmin(){
+  document.getElementById('adminTable').innerHTML = '<div class="empty">불러오는 중...</div>';
+  let recordMap = {};
+  try{
+    const res = await fetch(`${GAS_URL}?action=all`);
+    const data = await res.json();
+    (data.records||[]).forEach(r => { recordMap[String(r.no)] = r.time; });
+  }catch(e){
+    document.getElementById('adminTable').innerHTML = '<div class="empty">불러오지 못했습니다. 새로고침을 다시 눌러주세요.</div>';
+    return;
+  }
+  const results = SCHOOLS.map(s => ({ ...s, checked: !!recordMap[String(s.no)], time: recordMap[String(s.no)] || null }));
+  adminData = results;
+  const total = results.length;
+  const done = results.filter(r=>r.checked).length;
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-done').textContent = done;
+  document.getElementById('st-pct').textContent = total? Math.round(done/total*100)+'%' : '0%';
+  document.getElementById('progressBar').style.width = (total? done/total*100 : 0) + '%';
+  renderAdminTable();
+}
+
+function renderAdminTable(){
+  const q = norm(document.getElementById('adminSearch').value);
+  let list = adminData;
+  if(q){
+    list = list.filter(s => norm(s.school).includes(q) || norm(s.name).includes(q));
+  }
+  list = [...list].sort((a,b)=>{
+    if(a.checked===b.checked) return a.school.localeCompare(b.school,'ko');
+    return a.checked ? 1 : -1;
+  });
+  const box = document.getElementById('adminTable');
+  box.innerHTML = '';
+  for(const r of list){
+    const row = document.createElement('div');
+    row.className = 'admin-row' + (r.checked?' checked':'');
+    row.innerHTML = `<div class="l">${r.school} · ${r.name}</div><div class="r">${r.checked ? r.time+' 완료' : '미확인'}</div>`;
+    box.appendChild(row);
+  }
+}
+
+renderResults();
+</script>
+
+</body>
+</html>
