@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>경남사립학교장회 경품 추첨</title>
+<style>
+:root {
+  --navy:#15233c;
+  --navy2:#20365c;
+  --gold:#d6ad45;
+  --gold2:#f0d786;
+  --cream:#f7f2e5;
+  --paper:#fffdf7;
+  --ink:#17223a;
+  --muted:#6c7484;
+  --ok:#2d7452;
+  --warn:#a64d35;
+  --line:#dfd5bd;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  background:radial-gradient(circle at 50% 18%,#2c4773 0,var(--navy) 46%,#0d1729 100%);
+  color:white;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.app{height:100%;width:100%;position:relative}
+.view{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(18px,2.5vw,46px)}
+.panel{
+  width:min(1180px,94vw);
+  max-height:94vh;
+  background:rgba(255,253,247,.97);
+  color:var(--ink);
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:30px;
+  box-shadow:0 24px 80px rgba(0,0,0,.35);
+  padding:clamp(26px,4vw,60px);
+  overflow:auto;
+}
+.brand{text-align:center;margin-bottom:clamp(18px,2vw,32px)}
+.brand .org{font-size:clamp(20px,2vw,31px);font-weight:800;letter-spacing:.04em;color:var(--navy2)}
+.brand h1{margin:.35em 0 .15em;font-family:Georgia,"Malgun Gothic",serif;font-size:clamp(34px,4vw,64px);line-height:1.14;color:var(--navy)}
+.brand .event{font-size:clamp(17px,1.5vw,24px);color:var(--muted)}
+.goldline{width:90px;height:5px;border-radius:4px;background:var(--gold);margin:18px auto 0}
+.pinbox{max-width:520px;margin:0 auto;text-align:center}
+.pinbox input{
+  width:100%;padding:18px 20px;border:2px solid var(--line);border-radius:16px;
+  text-align:center;font-size:32px;letter-spacing:.3em;outline:none;background:white
+}
+.pinbox input:focus{border-color:var(--gold)}
+.primary,.secondary,.danger,.ghost{
+  border:0;border-radius:16px;padding:16px 24px;font-weight:800;
+}
+.primary{background:var(--navy);color:white}
+.secondary{background:#eee7d5;color:var(--navy)}
+.danger{background:#f7e8e2;color:var(--warn);border:1px solid #ebc7bb}
+.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.wide{width:100%;font-size:clamp(18px,1.5vw,24px);padding:20px}
+.msg{min-height:26px;margin:12px 0;color:var(--warn);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+.stat{border:1px solid var(--line);background:#fbf8ef;border-radius:18px;text-align:center;padding:20px 12px}
+.stat .n{font-size:clamp(34px,3vw,54px);font-weight:900;color:var(--navy)}
+.stat .l{color:var(--muted);margin-top:4px;font-size:15px}
+.counter{display:flex;align-items:center;justify-content:center;gap:18px;margin:24px 0}
+.counter button{width:58px;height:58px;border-radius:50%;border:0;background:var(--navy);color:white;font-size:30px;font-weight:900}
+.counter input{width:150px;text-align:center;font-size:44px;font-weight:900;border:2px solid var(--line);border-radius:16px;padding:7px 8px;color:var(--navy)}
+.rules{background:#f4efe1;border-radius:16px;padding:18px 22px;line-height:1.9;color:#4c5668}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.audio-status{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-top:16px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#aaa;margin-right:6px}
+.dot.ok{background:var(--ok)} .dot.bad{background:var(--warn)}
+.freeze{text-align:center}
+.freeze .big{font-size:clamp(62px,8vw,120px);font-weight:950;color:var(--navy);line-height:1}
+.freeze .caption{font-size:clamp(18px,1.8vw,28px);color:var(--muted);margin-top:10px}
+.freeze .stamp{margin:24px auto;font-size:clamp(17px,1.6vw,23px);background:#f3eddc;border-radius:16px;padding:14px 20px;max-width:600px}
+.stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3vh 4vw;text-align:center}
+.stage-top{position:absolute;top:3vh;left:4vw;right:4vw;display:flex;justify-content:space-between;align-items:center;color:#e9edf5;font-weight:700;font-size:clamp(15px,1.35vw,22px)}
+.progress{font-size:clamp(23px,2.2vw,38px);font-weight:900;color:var(--gold2)}
+.prize-title{font-size:clamp(36px,4vw,70px);font-weight:950;margin-bottom:3vh;color:#fff}
+.draw-btn{
+  width:min(1180px,84vw);height:min(400px,42vh);
+  border-radius:38px;border:3px solid rgba(240,215,134,.75);
+  background:linear-gradient(150deg,#223c68,#15233c);
+  color:white;box-shadow:0 24px 80px rgba(0,0,0,.35), inset 0 0 55px rgba(214,173,69,.08);
+  font-size:clamp(52px,6.2vw,110px);font-weight:950;letter-spacing:.03em;
+  transition:transform .12s,box-shadow .12s,opacity .2s
+}
+.draw-btn:hover{transform:translateY(-3px);box-shadow:0 30px 90px rgba(0,0,0,.42)}
+.draw-btn:active{transform:scale(.99)}
+.draw-btn:disabled{opacity:.45;cursor:not-allowed}
+.stage-foot{margin-top:3vh;color:#d8deea;font-size:clamp(15px,1.25vw,20px)}
+.rolling-box{min-height:44vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.roll-school{font-size:clamp(34px,4.5vw,76px);font-weight:900;color:#fff;max-width:92vw;line-height:1.18;word-break:keep-all}
+.roll-name{font-size:clamp(58px,8vw,136px);font-weight:950;color:var(--gold2);margin-top:2vh;letter-spacing:.04em}
+.roll-note{font-size:clamp(17px,1.5vw,24px);color:#d8deea;margin-top:3vh}
+.result-card{width:min(1250px,92vw);padding:clamp(24px,4vw,56px);border-radius:38px;background:rgba(255,253,247,.98);color:var(--ink);box-shadow:0 30px 100px rgba(0,0,0,.42);position:relative}
+.congrats{font-size:clamp(28px,3vw,52px);font-weight:900;color:var(--gold);margin-bottom:8px}
+.result-prize{font-size:clamp(22px,2vw,34px);font-weight:900;color:var(--navy2);margin-bottom:24px}
+.result-school{font-size:clamp(40px,5.2vw,88px);font-weight:950;color:var(--navy);line-height:1.18;word-break:keep-all}
+.result-name{font-size:clamp(70px,9vw,148px);font-weight:950;color:#8b6418;line-height:1.05;margin-top:18px}
+.result-honor{font-size:clamp(22px,2.2vw,38px);color:var(--muted);margin-top:4px}
+.result-actions{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-top:32px}
+.result-actions button{font-size:clamp(18px,1.6vw,26px);padding:20px 18px}
+.recovery-card{text-align:center;max-width:850px}
+.recovery-icon{font-size:72px}
+.recovery-card h2{font-size:clamp(30px,3vw,50px);margin:10px 0;color:var(--navy)}
+.recovery-card p{font-size:clamp(17px,1.5vw,23px);line-height:1.7;color:var(--muted)}
+.summary-list{margin:24px auto 0;max-width:850px}
+.winner-row{display:grid;grid-template-columns:95px 1fr 180px;align-items:center;gap:14px;padding:14px 8px;border-bottom:1px solid var(--line);font-size:clamp(16px,1.4vw,22px)}
+.winner-row .no{font-weight:900;color:#9a741f}
+.winner-row .school{font-weight:800;text-align:left} .winner-row .name{font-weight:900;text-align:right}
+.gear{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(9,18,34,.72);color:white;font-size:22px;z-index:20}
+.drawer{position:fixed;right:18px;bottom:76px;width:min(360px,calc(100vw - 36px));background:#fff;color:var(--ink);border-radius:18px;padding:18px;box-shadow:0 18px 60px rgba(0,0,0,.35);z-index:19}
+.drawer h3{margin:0 0 14px} .drawer button{width:100%;margin-top:8px}
+.checklist{font-size:14px;line-height:1.7;background:#f7f3e8;padding:12px;border-radius:12px;margin-top:12px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(120px);background:#07101f;color:#fff;padding:13px 20px;border-radius:12px;z-index:40;transition:.25s;box-shadow:0 10px 35px rgba(0,0,0,.35);font-weight:700}
+.toast.show{transform:translateX(-50%) translateY(0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:15}
+.small{font-size:13px;color:var(--muted)}
+@media(max-width:760px){
+  .stats{grid-template-columns:1fr 1fr}
+  .result-actions{grid-template-columns:1fr}
+  .winner-row{grid-template-columns:70px 1fr 100px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<canvas id="confetti"></canvas>
+
+<section class="view" id="pinView">
+  <div class="panel">
+    <div class="brand">
+      <div class="org">경남사립학교장회</div>
+      <h1>행운의 경품 추첨</h1>
+      <div class="event" id="pinEvent">현재 행사 정보를 확인하는 중입니다.</div>
+      <div class="goldline"></div>
+    </div>
+    <div class="pinbox">
+      <p>경품 추첨 관리자 PIN을 입력해 주세요.</p>
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="12" autocomplete="off" aria-label="관리자 PIN">
+      <div class="msg" id="pinMsg"></div>
+      <button class="primary wide" id="pinBtn">관리자 화면 열기</button>
+    </div>
+  </div>
+</section>
+
+<section class="view hidden" id="setupView">
+  <div class="panel">
+    <div class="brand">
+      <div class="org">경남사립학교장회</div>
+      <h1>경품 추첨 준비</h1>
+      <div class="event" id="setupEvent"></div>
+      <div class="goldline"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="attendanceCount">-</div><div class="l">현재 출석</div></div>
+      <div class="stat"><div class="n" id="targetPreview">10</div><div class="l">최종 당첨 예정</div></div>
+      <div class="stat"><div class="n">1회</div><div class="l">1인 최대 당첨</div></div>
+    </div>
+    <div style="text-align:center;font-weight:800;font-size:20px">최종 당첨자를 몇 명 뽑을까요?</div>
+    <div class="counter">
+      <button id="minusBtn" aria-label="감소">−</button>
+      <input id="targetInput" type="number" min="1" value="10">
+      <button id="plusBtn" aria-label="증가">+</button>
+    </div>
+    <div class="rules">
+      <strong>추첨 규칙</strong><br>
+      · 추첨 시작 시점까지 출석 확인을 마친 참석자만 대상입니다.<br>
+      · 1인 1회만 당첨됩니다.<br>
+      · 현장 부재 처리된 참석자는 이후 모든 경품 추첨에서 제외됩니다.<br>
+      · 최종 당첨 인원은 <strong>수령 확인된 인원</strong> 기준입니다.
+    </div>
+    <div class="audio-status">
+      <span><i class="dot" id="rollDot"></i>롤링 음원 <b id="rollState">확인 중</b></span>
+      <span><i class="dot" id="fanDot"></i>팡파르 음원 <b id="fanState">확인 중</b></span>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="soundTestBtn">🔊 효과음 테스트</button>
+      <button class="ghost" id="refreshSetupBtn">출석자 새로고침</button>
+    </div>
+    <div class="msg" id="setupMsg" style="text-align:center"></div>
+    <button class="primary wide" id="startBtn">10명 추첨 시작</button>
+  </div>
+</section>
+
+<section class="view hidden" id="freezeView">
+  <div class="panel freeze">
+    <div class="brand">
+      <div class="org">경남사립학교장회</div>
+      <h1>추첨 대상 확정</h1>
+      <div class="event" id="freezeEvent"></div>
+    </div>
+    <div class="big" id="freezeCount">0명</div>
+    <div class="caption">출석 확인자를 추첨 후보로 확정했습니다.</div>
+    <div class="stamp" id="freezeStamp"></div>
+    <div class="rules" style="text-align:left;max-width:720px;margin:0 auto">
+      · 지금부터 새로 출석한 참석자는 이번 경품 추첨 후보에 추가되지 않습니다.<br>
+      · 당첨자는 수령 확인 전까지 보류(PENDING) 상태입니다.<br>
+      · 부재 처리된 참석자는 다시 후보로 돌아오지 않습니다.
+    </div>
+    <button class="primary wide" id="goReadyBtn" style="max-width:720px;margin:26px auto 0;display:block">경품 추첨 시작</button>
+  </div>
+</section>
+
+<section class="hidden" id="readyView">
+  <div class="stage">
+    <div class="stage-top">
+      <div id="readyEvent"></div>
+      <div class="progress" id="readyProgress"></div>
+      <div id="readyRemain"></div>
+    </div>
+    <div class="prize-title" id="readyPrize">1번 경품</div>
+    <button class="draw-btn" id="drawBtn">당첨자 추첨</button>
+    <div class="stage-foot">Space 키로도 추첨할 수 있습니다 · 기당첨자 및 부재자는 자동 제외됩니다.</div>
+  </div>
+</section>
+
+<section class="hidden" id="rollingView">
+  <div class="stage">
+    <div class="stage-top">
+      <div id="rollingEvent"></div>
+      <div class="progress" id="rollingProgress"></div>
+      <div id="rollingRemain"></div>
+    </div>
+    <div class="prize-title" id="rollingPrize"></div>
+    <div class="rolling-box">
+      <div class="roll-school" id="rollSchool">추첨 중입니다</div>
+      <div class="roll-name" id="rollName">···</div>
+      <div class="roll-note" id="rollNote">행운의 주인공을 찾고 있습니다.</div>
+    </div>
+  </div>
+</section>
+
+<section class="view hidden" id="resultView">
+  <div class="result-card">
+    <div class="congrats">🎉 축하합니다!</div>
+    <div class="result-prize" id="resultPrize"></div>
+    <div class="result-school" id="resultSchool"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-honor">교장선생님</div>
+    <div class="result-actions">
+      <button class="primary" id="confirmBtn">수령 확인 · 다음 경품</button>
+      <button class="danger" id="absentBtn">현장 부재 · 재추첨</button>
+    </div>
+  </div>
+</section>
+
+<section class="view hidden" id="recoveryView">
+  <div class="panel recovery-card">
+    <div class="recovery-icon">📡</div>
+    <h2 id="recoveryTitle">통신 상태를 확인해 주세요</h2>
+    <p id="recoveryText">서버에서 추첨 요청이 처리되었는지 확인해야 합니다.</p>
+    <button class="primary wide" id="statusCheckBtn">상태 확인</button>
+    <button class="secondary wide hidden" id="retryDrawBtn" style="margin-top:10px">현재 추첨 화면으로</button>
+    <button class="secondary wide hidden" id="revealPendingBtn" style="margin-top:10px">당첨 결과 다시 공개</button>
+  </div>
+</section>
+
+<section class="view hidden" id="summaryView">
+  <div class="panel">
+    <div class="brand">
+      <div class="org">경남사립학교장회</div>
+      <h1>🎉 경품 추첨 완료</h1>
+      <div class="event" id="summaryEvent"></div>
+      <div class="goldline"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="summaryConfirmed">0</div><div class="l">최종 당첨</div></div>
+      <div class="stat"><div class="n" id="summaryAbsent">0</div><div class="l">현장 부재</div></div>
+      <div class="stat"><div class="n" id="summaryAttempts">0</div><div class="l">총 추첨 시도</div></div>
+    </div>
+    <div class="summary-list" id="summaryList"></div>
+    <div class="actions">
+      <button class="secondary" id="copyBtn">당첨자 명단 복사</button>
+      <button class="secondary" id="finalCsvBtn">최종당첨자 CSV</button>
+      <button class="ghost" id="logCsvBtn">전체기록 CSV</button>
+    </div>
+  </div>
+</section>
+
+<button class="gear hidden" id="gearBtn" title="운영 메뉴">⚙</button>
+<div class="drawer hidden" id="drawer">
+  <h3>운영 메뉴</h3>
+  <button class="secondary" id="audioToggleBtn">🔊 효과음 ON</button>
+  <button class="secondary" id="drawerSoundTest">효과음 테스트</button>
+  <button class="secondary" id="fullscreenBtn">전체화면 전환</button>
+  <div class="checklist">
+    <strong>현장 음향 확인</strong><br>
+    □ 팡파르가 실제로 들리는가<br>
+    □ Windows/Mac 출력 장치를 확인했는가<br>
+    □ HDMI 프로젝터 스피커가 아닌 강당 앰프로 출력되는가<br>
+    □ 노트북·앰프 볼륨이 적절한가
+  </div>
+  <div class="small" style="margin-top:10px">단축키: Space 추첨 · Enter 수령확인 · F 전체화면 · M 음향</div>
+</div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzbuNTeT5U2A89HalCmqb11nqQirDyQZbBfc027We0cSZQxd4HWGNsE9V8_0BmSdXbqcA/exec";
+const SCHOOLS = [{"no":1,"region":"합천","level":"중학교","school":"가회중학교","name":"박정포"},{"no":2,"region":"산청","level":"고등학교","school":"간디고등학교","name":"정미숙"},{"no":3,"region":"양산","level":"중학교","school":"개운중학교","name":"도태준"},{"no":4,"region":"거제","level":"고등학교","school":"거제고등학교","name":"김회진"},{"no":5,"region":"거제","level":"특수학교","school":"거제애광학교","name":"조현관"},{"no":6,"region":"거제","level":"중학교","school":"거제중학교","name":"옥경수"},{"no":7,"region":"거창","level":"고등학교","school":"거창고등학교","name":"김예진"},{"no":8,"region":"거창","level":"고등학교","school":"거창대성고등학교","name":"박상규"},{"no":9,"region":"거창","level":"중학교","school":"거창대성중학교","name":"노상신"},{"no":10,"region":"거창","level":"고등학교","school":"거창중앙고등학교","name":"한성환"},{"no":11,"region":"산청","level":"고등학교","school":"경남간호고등학교","name":"공윤식"},{"no":12,"region":"창원","level":"고등학교","school":"경남관광고등학교","name":"조태제"},{"no":13,"region":"함안","level":"고등학교","school":"경남로봇고등학교","name":"박병기"},{"no":14,"region":"창원","level":"고등학교","school":"경남미용고등학교","name":"서연수"},{"no":15,"region":"진주","level":"고등학교","school":"경남예술고등학교","name":"심재화"},{"no":16,"region":"양산","level":"고등학교","school":"경남외국어고등학교","name":"이상환"},{"no":17,"region":"진주","level":"고등학교","school":"경남자동차고등학교","name":"하재웅"},{"no":18,"region":"창원","level":"고등학교","school":"경남전자고등학교","name":"김영목"},{"no":19,"region":"창원","level":"고등학교","school":"경상고등학교","name":"김미경"},{"no":20,"region":"진주","level":"고등학교","school":"경진고등학교","name":"황일환"},{"no":21,"region":"진주","level":"고등학교","school":"경해여자고등학교","name":"김진하"},{"no":22,"region":"진주","level":"중학교","school":"경해여자중학교","name":"김혜경"},{"no":23,"region":"고성","level":"고등학교","school":"고성고등학교","name":"김병수"},{"no":24,"region":"사천","level":"중학교","school":"곤명중학교","name":"강태현"},{"no":25,"region":"함안","level":"고등학교","school":"군북고등학교","name":"오정혜"},{"no":26,"region":"함안","level":"중학교","school":"군북중학교","name":"강종철"},{"no":27,"region":"김해","level":"고등학교","school":"김해중앙여자고등학교","name":"강선혜"},{"no":28,"region":"김해","level":"중학교","school":"김해중앙여자중학교","name":"변영수"},{"no":29,"region":"김해","level":"고등학교","school":"김해한일여자고등학교","name":"이연지"},{"no":30,"region":"사천","level":"중학교","school":"남양중학교","name":"한양희"},{"no":31,"region":"창녕","level":"고등학교","school":"남지고등학교","name":"정대열"},{"no":32,"region":"창녕","level":"중학교","school":"남지여자중학교","name":"신종만"},{"no":33,"region":"창녕","level":"중학교","school":"남지중학교","name":"김병동"},{"no":34,"region":"남해","level":"고등학교","school":"남해고등학교","name":"김보경"},{"no":35,"region":"남해","level":"고등학교","school":"남해해성고등학교","name":"김동진"},{"no":36,"region":"합천","level":"중학교","school":"대병중학교","name":"제종준"},{"no":37,"region":"함안","level":"중학교","school":"대산중학교","name":"이윤아"},{"no":38,"region":"거창","level":"고등학교","school":"대성일고등학교","name":"정현종"},{"no":39,"region":"창녕","level":"중학교","school":"대성중학교","name":"윤정호"},{"no":40,"region":"진주","level":"고등학교","school":"대아고등학교","name":"정규석"},{"no":41,"region":"진주","level":"중학교","school":"대아중학교","name":"이정훈"},{"no":42,"region":"거제","level":"초등학교","school":"대우초등학교","name":"반정옥"},{"no":43,"region":"밀양","level":"중학교","school":"동국대사대부속홍제중학교","name":"강호숙"},{"no":44,"region":"밀양","level":"중학교","school":"동명중학교","name":"권철혁"},{"no":45,"region":"통영","level":"고등학교","school":"동원고등학교","name":"임도헌"},{"no":46,"region":"통영","level":"중학교","school":"동원중학교","name":"홍지연"},{"no":47,"region":"거제","level":"중학교","school":"둔덕중학교","name":"남창경"},{"no":48,"region":"창원","level":"고등학교","school":"마산공업고등학교","name":"박옥수"},{"no":49,"region":"창원","level":"고등학교","school":"마산무학여자고등학교","name":"이명숙"},{"no":50,"region":"창원","level":"중학교","school":"마산무학여자중학교","name":"류승수"},{"no":51,"region":"창원","level":"고등학교","school":"마산삼진고등학교","name":"이미영"},{"no":52,"region":"창원","level":"중학교","school":"마산삼진중학교","name":"조호제"},{"no":53,"region":"창원","level":"고등학교","school":"마산제일고등학교","name":"이석재"},{"no":54,"region":"창원","level":"고등학교","school":"마산제일여자고등학교","name":"배종선"},{"no":55,"region":"창원","level":"중학교","school":"마산제일여자중학교","name":"안미경"},{"no":56,"region":"창원","level":"고등학교","school":"마산중앙고등학교","name":"김성두"},{"no":57,"region":"창원","level":"중학교","school":"마산중앙중학교","name":"김소영"},{"no":58,"region":"함안","level":"고등학교","school":"명덕고등학교","name":"차미라"},{"no":59,"region":"합천","level":"중학교","school":"묘산중학교","name":"곽명희"},{"no":60,"region":"양산","level":"중학교","school":"물금동아중학교","name":"정지훈"},{"no":61,"region":"밀양","level":"고등학교","school":"밀성고등학교","name":"황인주"},{"no":62,"region":"밀양","level":"중학교","school":"밀성여자중학교","name":"이영민"},{"no":63,"region":"밀양","level":"고등학교","school":"밀성제일고등학교","name":"고명진"},{"no":64,"region":"밀양","level":"중학교","school":"밀성중학교","name":"최인길"},{"no":65,"region":"밀양","level":"중학교","school":"밀양동강중학교","name":"박영진"},{"no":66,"region":"밀양","level":"고등학교","school":"밀양동명고등학교","name":"금선화"},{"no":67,"region":"양산","level":"고등학교","school":"보광고등학교","name":"신용수"},{"no":68,"region":"양산","level":"중학교","school":"보광중학교","name":"이규성"},{"no":69,"region":"사천","level":"고등학교","school":"사천고등학교","name":"송일승"},{"no":70,"region":"사천","level":"고등학교","school":"사천여자고등학교","name":"전경원"},{"no":71,"region":"밀양","level":"고등학교","school":"삼랑진고등학교","name":"장혜진"},{"no":72,"region":"밀양","level":"중학교","school":"삼랑진중학교","name":"문경난"},{"no":73,"region":"사천","level":"고등학교","school":"삼천포고등학교","name":"서영희"},{"no":74,"region":"사천","level":"고등학교","school":"삼천포여자고등학교","name":"이임섭"},{"no":75,"region":"사천","level":"중학교","school":"삼천포여자중학교","name":"전협배"},{"no":76,"region":"사천","level":"중학교","school":"삼천포중학교","name":"김태원"},{"no":77,"region":"진주","level":"고등학교","school":"삼현여자고등학교","name":"김형곤"},{"no":78,"region":"진주","level":"중학교","school":"삼현여자중학교","name":"조영주"},{"no":79,"region":"남해","level":"중학교","school":"상주중학교","name":"김봉겸"},{"no":80,"region":"거창","level":"중학교","school":"샛별중학교","name":"김기호(직)"},{"no":81,"region":"거창","level":"초등학교","school":"샛별초등학교","name":"전기환"},{"no":82,"region":"진주","level":"고등학교","school":"선명여자고등학교","name":"주영규"},{"no":83,"region":"진주","level":"중학교","school":"선인국제중학교","name":"장지욱"},{"no":84,"region":"창녕","level":"중학교","school":"성산중학교","name":"심영보"},{"no":85,"region":"창원","level":"고등학교","school":"성지여자고등학교","name":"문병훈"},{"no":86,"region":"창원","level":"중학교","school":"성지여자중학교","name":"김우철"},{"no":87,"region":"밀양","level":"고등학교","school":"세종고등학교","name":"박진제"},{"no":88,"region":"밀양","level":"중학교","school":"세종중학교","name":"김종섭"},{"no":89,"region":"창녕","level":"중학교","school":"신창여자중학교","name":"정순영"},{"no":90,"region":"함양","level":"중학교","school":"안의중학교","name":"안정덕"},{"no":91,"region":"양산","level":"고등학교","school":"양산여자고등학교","name":"김형수"},{"no":92,"region":"양산","level":"중학교","school":"양산여자중학교","name":"서동권"},{"no":93,"region":"양산","level":"고등학교","school":"양산제일고등학교","name":"김효진"},{"no":94,"region":"거제","level":"중학교","school":"외포중학교","name":"신부선"},{"no":95,"region":"사천","level":"고등학교","school":"용남고등학교","name":"최연진"},{"no":96,"region":"사천","level":"중학교","school":"용남중학교","name":"신현숙"},{"no":97,"region":"창원","level":"중학교","school":"웅동중학교","name":"박성완"},{"no":98,"region":"의령","level":"고등학교","school":"의령여자고등학교","name":"이성진"},{"no":99,"region":"의령","level":"중학교","school":"의령여자중학교","name":"김영미"},{"no":100,"region":"창원","level":"중학교","school":"의신중학교","name":"배용근"},{"no":101,"region":"남해","level":"중학교","school":"이동중학교","name":"윤창수"},{"no":102,"region":"거제","level":"중학교","school":"장목예술중학교","name":"박상욱"},{"no":103,"region":"김해","level":"중학교","school":"장유중학교","name":"한숙희"},{"no":104,"region":"의령","level":"중학교","school":"정곡중학교","name":"강훈구"},{"no":105,"region":"산청","level":"고등학교","school":"지리산고등학교","name":"박영출"},{"no":106,"region":"의령","level":"중학교","school":"지정중학교","name":"박주연"},{"no":107,"region":"김해","level":"중학교","school":"진례중학교","name":"전주현"},{"no":108,"region":"진주","level":"고등학교","school":"진주동명고등학교","name":"양판석"},{"no":109,"region":"진주","level":"중학교","school":"진주동명중학교","name":"최용준"},{"no":110,"region":"진주","level":"중학교","school":"진주동중학교","name":"김종섭"},{"no":111,"region":"진주","level":"고등학교","school":"진주외국어고등학교","name":"최문근"},{"no":112,"region":"진주","level":"고등학교","school":"진주제일여자고등학교","name":"손광락"},{"no":113,"region":"창원","level":"중학교","school":"진해남중학교","name":"김태형"},{"no":114,"region":"창원","level":"고등학교","school":"진해세화여자고등학교","name":"이진희"},{"no":115,"region":"창원","level":"고등학교","school":"진해중앙고등학교","name":"정성두(직)"},{"no":116,"region":"창녕","level":"고등학교","school":"창녕고등학교","name":"이성원"},{"no":117,"region":"창녕","level":"고등학교","school":"창녕대성고등학교","name":"윤정호"},{"no":118,"region":"창녕","level":"고등학교","school":"창녕여자고등학교","name":"하태욱"},{"no":119,"region":"창녕","level":"중학교","school":"창녕여자중학교","name":"박형진"},{"no":120,"region":"창녕","level":"고등학교","school":"창녕옥야고등학교","name":"윤종민"},{"no":121,"region":"창녕","level":"중학교","school":"창녕옥야중학교","name":"황태현"},{"no":122,"region":"남해","level":"고등학교","school":"창선고등학교","name":"한창호"},{"no":123,"region":"남해","level":"중학교","school":"창선중학교","name":"박상일"},{"no":124,"region":"창원","level":"고등학교","school":"창신고등학교","name":"이상진"},{"no":125,"region":"창원","level":"중학교","school":"창신중학교","name":"강정묵"},{"no":126,"region":"창원","level":"고등학교","school":"창원경일고등학교","name":"변창우"},{"no":127,"region":"창원","level":"고등학교","school":"창원경일여자고등학교","name":"진성일"},{"no":128,"region":"창원","level":"고등학교","school":"창원고등학교","name":"장명득"},{"no":129,"region":"창원","level":"고등학교","school":"창원공업고등학교","name":"박상권"},{"no":130,"region":"창원","level":"고등학교","school":"창원남고등학교","name":"김신철"},{"no":131,"region":"창원","level":"중학교","school":"창원남중학교","name":"윤정수"},{"no":132,"region":"창원","level":"고등학교","school":"창원대산고등학교","name":"서정규"},{"no":133,"region":"창원","level":"중학교","school":"창원대산중학교","name":"최갑열"},{"no":134,"region":"창원","level":"특수학교","school":"창원동백학교","name":"이금주"},{"no":135,"region":"창원","level":"고등학교","school":"창원문성고등학교","name":"정재운"},{"no":136,"region":"창원","level":"고등학교","school":"창원성민여자고등학교","name":"이진기(직)"},{"no":137,"region":"창원","level":"중학교","school":"창원여자중학교","name":"양승문"},{"no":138,"region":"창원","level":"중학교","school":"창원중학교","name":"김선희"},{"no":139,"region":"고성","level":"고등학교","school":"철성고등학교","name":"송영기"},{"no":140,"region":"고성","level":"중학교","school":"철성중학교","name":"김승자(직)"},{"no":141,"region":"통영","level":"고등학교","school":"충렬여자고등학교","name":"최종렬"},{"no":142,"region":"통영","level":"중학교","school":"충렬여자중학교","name":"강동훈"},{"no":143,"region":"함안","level":"중학교","school":"칠성중학교","name":"권희주"},{"no":144,"region":"함안","level":"고등학교","school":"칠원고등학교","name":"송현정"},{"no":145,"region":"함안","level":"중학교","school":"칠원중학교","name":"정명애"},{"no":146,"region":"하동","level":"고등학교","school":"하동여자고등학교","name":"오준영"},{"no":147,"region":"하동","level":"중학교","school":"하동중학교","name":"류용만"},{"no":148,"region":"창녕","level":"고등학교","school":"한국과학기술고등학교","name":"이종현"},{"no":149,"region":"김해","level":"중학교","school":"한림중학교","name":"이명진"},{"no":150,"region":"창원","level":"고등학교","school":"한일여자고등학교","name":"박항신"},{"no":151,"region":"함안","level":"중학교","school":"함성중학교","name":"이복순"},{"no":152,"region":"함안","level":"중학교","school":"함안여자중학교","name":"윤상보"},{"no":153,"region":"합천","level":"고등학교","school":"합천여자고등학교","name":"문용섭"},{"no":154,"region":"합천","level":"중학교","school":"합천여자중학교","name":"정재우"},{"no":155,"region":"합천","level":"고등학교","school":"합천평화고등학교","name":"이미경"},{"no":156,"region":"거제","level":"고등학교","school":"해성고등학교","name":"최오석"},{"no":157,"region":"거제","level":"중학교","school":"해성중학교(거제)","name":"이미경"},{"no":158,"region":"남해","level":"중학교","school":"해성중학교(남해)","name":"백종기"},{"no":159,"region":"합천","level":"중학교","school":"해인중학교","name":"이호재"},{"no":160,"region":"거창","level":"중학교","school":"혜성여자중학교","name":"이홍남"},{"no":161,"region":"양산","level":"고등학교","school":"효암고등학교","name":"김순남"}];
+const SCHOOL_MAP = new Map(SCHOOLS.map(x => [Number(x.no), x]));
+const AUDIO = {
+  rolling: new Audio('./assets/rolling.mp3'),
+  fanfare: new Audio('./assets/fanfare.mp3')
+};
+AUDIO.rolling.preload = 'auto';
+AUDIO.fanfare.preload = 'auto';
+AUDIO.rolling.loop = true;
+AUDIO.rolling.volume = 0.58;
+AUDIO.fanfare.volume = 0.72;
+try { AUDIO.rolling.load(); AUDIO.fanfare.load(); } catch(e) {}
+
+const app = {
+  pin: sessionStorage.getItem('drawPin') || '',
+  ui: 'PIN',
+  busy: false,
+  soundOn: true,
+  status: null,
+  sessionId: null,
+  candidateSnapshot: [],
+  excluded: new Set(),
+  pending: null,
+  lastWasAbsent: false,
+  requestSeq: 0
+};
+
+const views = ['pinView','setupView','freezeView','readyView','rollingView','resultView','recoveryView','summaryView'];
+const $ = id => document.getElementById(id);
+function show(id) {
+  views.forEach(v => $(v).classList.toggle('hidden', v !== id));
+  app.ui = id.replace('View','').toUpperCase();
+  $('gearBtn').classList.toggle('hidden', id === 'pinView');
+  $('drawer').classList.add('hidden');
+}
+function fmtTime(v) {
+  if(!v) return '-';
+  const d = new Date(v);
+  if(Number.isNaN(d.getTime())) return String(v);
+  return new Intl.DateTimeFormat('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(d);
+}
+function toast(msg) {
+  $('toast').textContent = msg;
+  $('toast').classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>$('toast').classList.remove('show'),2200);
+}
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+function maskName(name) {
+  name = String(name||'').replace(/\(직\)/g,'').trim();
+  if(name.length <= 1) return name;
+  if(name.length === 2) return name[0] + '○';
+  return name[0] + '○'.repeat(Math.max(1,name.length-2)) + name[name.length-1];
+}
+function maskSchool(school) {
+  const s = String(school||'');
+  if(s.length <= 5) return s;
+  const suffixes = ['고등학교','중학교','초등학교','학교'];
+  let suffix = suffixes.find(x=>s.endsWith(x)) || '';
+  let stem = suffix ? s.slice(0,-suffix.length) : s;
+  if(stem.length <= 2) return stem[0] + '○' + suffix;
+  return stem.slice(0,2) + '○'.repeat(Math.min(3,stem.length-2)) + suffix;
+}
+function schoolFor(no) { return SCHOOL_MAP.get(Number(no)) || {no:Number(no),school:'학교 정보 없음',name:'성명 미확인',region:'',level:''}; }
+function normalizeCandidate(x) {
+  if(typeof x === 'number' || typeof x === 'string') return schoolFor(Number(x));
+  return {...schoolFor(Number(x.no)), ...x, no:Number(x.no)};
+}
+
+async function apiGet(action, params={}, timeoutMs=8000) {
+  const controller = new AbortController();
+  const t = setTimeout(()=>controller.abort(), timeoutMs);
+  try {
+    const u = new URL(GAS_URL);
+    u.searchParams.set('action',action);
+    Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,String(v)));
+    const res = await fetch(u.toString(),{redirect:'follow',cache:'no-store',signal:controller.signal});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return await res.json();
+  } finally { clearTimeout(t); }
+}
+async function apiPost(action, payload={}, timeoutMs=8000) {
+  const controller = new AbortController();
+  const t = setTimeout(()=>controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(GAS_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action,...payload}),
+      redirect:'follow',
+      cache:'no-store',
+      signal:controller.signal
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return await res.json();
+  } finally { clearTimeout(t); }
+}
+
+function hydrateStatus(data) {
+  app.status = data || {};
+  app.sessionId = data.sessionId || null;
+  app.candidateSnapshot = (data.candidateSnapshot || []).map(normalizeCandidate);
+  app.excluded = new Set((data.excludedMemberNos || []).map(Number));
+  app.pending = data.pendingWinner ? normalizeCandidate({...data.pendingWinner,no:data.pendingWinner.memberNo ?? data.pendingWinner.no}) : null;
+  if(app.pending && data.pendingWinner.pendingId) app.pending.pendingId = data.pendingWinner.pendingId;
+  if(app.pending && data.pendingWinner.prizeNo) app.pending.prizeNo = data.pendingWinner.prizeNo;
+}
+
+async function publicStatus() {
+  try {
+    const d = await apiGet('drawStatus',{mode:'public'},6000);
+    $('pinEvent').textContent = d.eventName ? '현재 행사 · '+d.eventName : '현재 행사를 확인해 주세요.';
+  } catch(e) {
+    $('pinEvent').textContent = '서버 연결을 확인한 뒤 관리자 PIN을 입력해 주세요.';
+  }
+}
+
+async function authenticate() {
+  const pin = $('pinInput').value.trim();
+  if(!pin) return;
+  unlockAudioOnce();
+  $('pinBtn').disabled = true;
+  $('pinMsg').textContent = '확인 중입니다...';
+  try {
+    const d = await apiPost('drawStatus',{pin},8000);
+    if(!d.authorized) throw new Error(d.message || 'PIN이 올바르지 않습니다.');
+    app.pin = pin;
+    sessionStorage.setItem('drawPin',pin);
+    hydrateStatus(d);
+    $('pinMsg').textContent = '';
+    routeFromStatus(d);
+  } catch(e) {
+    $('pinMsg').textContent = e.name === 'AbortError' ? '서버 응답이 늦습니다. 다시 시도해 주세요.' : (e.message || '관리자 확인에 실패했습니다.');
+  } finally { $('pinBtn').disabled = false; }
+}
+
+function routeFromStatus(d) {
+  if(d.sessionStatus === 'COMPLETED') {
+    renderSummary(d);
+    show('summaryView');
+    return;
+  }
+  if(d.sessionStatus === 'RUNNING') {
+    if(d.pendingWinner) {
+      showRecoveryPending(d);
+    } else {
+      renderReady(d);
+      show('readyView');
+    }
+    return;
+  }
+  renderSetup(d);
+  show('setupView');
+}
+
+function renderSetup(d) {
+  $('setupEvent').textContent = d.eventName || '현재 행사';
+  $('attendanceCount').textContent = Number(d.attendanceCount||0);
+  const max = Math.max(1,Number(d.attendanceCount||1));
+  let v = Math.min(10,max);
+  $('targetInput').value = v;
+  $('targetInput').max = max;
+  updateTargetUI();
+}
+function updateTargetUI() {
+  const count = Number($('attendanceCount').textContent)||0;
+  let v = Math.floor(Number($('targetInput').value)||1);
+  v = Math.max(1, Math.min(Math.max(1,count), v));
+  $('targetInput').value = v;
+  $('targetPreview').textContent = v;
+  $('startBtn').textContent = v+'명 추첨 시작';
+}
+async function refreshSetup() {
+  $('setupMsg').textContent='출석 현황을 새로 확인하는 중입니다...';
+  try {
+    const d = await apiPost('drawStatus',{pin:app.pin},8000);
+    if(!d.authorized) throw new Error('관리자 인증이 만료되었습니다.');
+    hydrateStatus(d);
+    if(d.sessionStatus) return routeFromStatus(d);
+    renderSetup(d);
+    $('setupMsg').textContent='최신 출석 현황으로 갱신했습니다.';
+    setTimeout(()=>$('setupMsg').textContent='',1800);
+  } catch(e) { $('setupMsg').textContent='출석 현황을 불러오지 못했습니다.'; }
+}
+
+async function startDrawSession() {
+  const target = Math.floor(Number($('targetInput').value)||0);
+  const attendance = Number($('attendanceCount').textContent)||0;
+  if(target<1 || target>attendance) {
+    $('setupMsg').textContent='당첨 인원은 현재 출석 인원 범위 안에서 설정해 주세요.';
+    return;
+  }
+  $('startBtn').disabled=true;
+  $('setupMsg').textContent='출석자를 확정하고 있습니다...';
+  try {
+    const d = await apiPost('drawStart',{pin:app.pin,targetWinnerCount:target},15000);
+    if(!d.ok) throw new Error(d.message||'추첨 세션을 시작하지 못했습니다.');
+    hydrateStatus(d);
+    if(d.reused) {
+      routeFromStatus(d);
+      return;
+    }
+    $('freezeEvent').textContent = d.eventName || '';
+    $('freezeCount').textContent = (d.candidateCount||0)+'명';
+    $('freezeStamp').textContent = fmtTime(d.snapshotAt)+' 기준 · 최종 당첨 예정 '+d.targetWinnerCount+'명';
+    show('freezeView');
+  } catch(e) {
+    $('setupMsg').textContent = e.name==='AbortError' ? '서버 응답이 지연되었습니다. 출석 현황을 다시 확인해 주세요.' : (e.message||'시작하지 못했습니다.');
+  } finally { $('startBtn').disabled=false; }
+}
+
+function renderReady(d=app.status) {
+  app.status = d;
+  const p = Number(d.currentPrizeNo||1);
+  const target = Number(d.targetWinnerCount||0);
+  const attempt = Number(d.currentAttemptNo||1);
+  $('readyEvent').textContent = d.eventName || '';
+  $('readyProgress').textContent = p+' / '+target;
+  $('readyRemain').textContent = '남은 후보 '+Number(d.eligibleCount||0)+'명';
+  $('readyPrize').textContent = p+'번 경품';
+  $('drawBtn').textContent = attempt>1 ? '당첨자 재추첨' : '당첨자 추첨';
+  $('drawBtn').disabled = Number(d.eligibleCount||0) <= 0;
+}
+function eligibleLocal() {
+  return app.candidateSnapshot.filter(x=>!app.excluded.has(Number(x.no)));
+}
+
+async function beginDraw() {
+  if(app.busy || app.ui!=='READY') return;
+  app.busy = true;
+  app.requestSeq += 1;
+  const seq = app.requestSeq;
+  const d = app.status;
+  $('rollingEvent').textContent=d.eventName||'';
+  $('rollingProgress').textContent=(d.currentPrizeNo||1)+' / '+(d.targetWinnerCount||0);
+  $('rollingRemain').textContent='남은 후보 '+(d.eligibleCount||0)+'명';
+  $('rollingPrize').textContent=(d.currentPrizeNo||1)+'번 경품';
+  $('rollNote').textContent='행운의 주인공을 찾고 있습니다.';
+  show('rollingView');
+  startRollingAudio();
+  const pool = eligibleLocal();
+  let result=null, err=null, settled=false;
+  const promise = apiPost('drawNext',{pin:app.pin,sessionId:app.sessionId},8000)
+    .then(x=>{result=x;settled=true;})
+    .catch(e=>{err=e;settled=true;});
+
+  const started=performance.now();
+  while(performance.now()-started < 2800) {
+    if(seq!==app.requestSeq) return;
+    flashRandom(pool);
+    const elapsed=performance.now()-started;
+    const delay = elapsed<1600?70:elapsed<2200?110:elapsed<2550?170:240;
+    await sleep(delay);
+  }
+  if(!settled) {
+    $('rollNote').textContent='결과 확인 중...';
+    while(performance.now()-started < 5000 && !settled) {
+      flashRandom(pool);
+      await sleep(330);
+    }
+  }
+  if(!settled) {
+    $('rollSchool').textContent='서버 응답을 기다리고 있습니다';
+    $('rollName').textContent='···';
+    $('rollNote').textContent='잠시만 기다려 주세요.';
+    while(!settled && performance.now()-started < 8400) await sleep(120);
+  }
+  await promise;
+  stopRollingAudio();
+  if(err || !result || !result.ok) {
+    app.busy=false;
+    enterRecovery(err || new Error(result?.message||'추첨 결과를 확인하지 못했습니다.'));
+    return;
+  }
+  if(result.code==='PENDING_EXISTS' && result.pendingWinner) {
+    hydrateStatus(result);
+    await landOnWinner(normalizeCandidate({...result.pendingWinner,no:result.pendingWinner.memberNo}), pool);
+    showPendingResult(result.pendingWinner);
+    app.busy=false;
+    return;
+  }
+  if(!result.winner) {
+    app.busy=false;
+    enterRecovery(new Error(result.message||'당첨자 정보가 없습니다.'));
+    return;
+  }
+  hydrateStatus(result);
+  const winner=normalizeCandidate({...result.winner,no:result.winner.memberNo ?? result.winner.no});
+  await landOnWinner(winner,pool);
+  showPendingResult(result.winner);
+  app.busy=false;
+}
+
+function flashRandom(pool) {
+  if(!pool.length) return;
+  const x=pool[Math.floor(Math.random()*pool.length)];
+  $('rollSchool').textContent=maskSchool(x.school);
+  $('rollName').textContent=maskName(x.name);
+}
+async function landOnWinner(winner,pool) {
+  const non = pool.filter(x=>Number(x.no)!==Number(winner.no));
+  const picks=[];
+  for(let i=0;i<3;i++) if(non.length) picks.push(non[Math.floor(Math.random()*non.length)]);
+  const queue=[...picks,winner];
+  const delays=[220,320,470,760];
+  $('rollNote').textContent='당첨자를 확인했습니다.';
+  for(let i=0;i<queue.length;i++) {
+    const x=queue[i];
+    const last=i===queue.length-1;
+    $('rollSchool').textContent=last?x.school:maskSchool(x.school);
+    $('rollName').textContent=last?String(x.name||'').replace(/\(직\)/g,'').trim():maskName(x.name);
+    await sleep(delays[i]);
+  }
+}
+function showPendingResult(raw) {
+  const w=normalizeCandidate({...raw,no:raw.memberNo ?? raw.no});
+  w.pendingId=raw.pendingId || raw.logId || w.pendingId;
+  w.prizeNo=raw.prizeNo || app.status?.currentPrizeNo || 1;
+  app.pending=w;
+  app.excluded.add(Number(w.no));
+  $('resultPrize').textContent=w.prizeNo+'번 경품 당첨자';
+  $('resultSchool').textContent=w.school;
+  $('resultName').textContent=String(w.name||'').replace(/\(직\)/g,'').trim();
+  show('resultView');
+  playFanfare();
+  burstConfetti();
+}
+
+async function confirmWinner() {
+  if(app.busy || !app.pending) return;
+  app.busy=true;
+  $('confirmBtn').disabled=$('absentBtn').disabled=true;
+  try {
+    const d=await apiPost('drawConfirm',{pin:app.pin,sessionId:app.sessionId,pendingId:app.pending.pendingId},8000);
+    if(!d.ok) throw new Error(d.message||'수령 확인을 저장하지 못했습니다.');
+    hydrateStatus(d);
+    app.pending=null;
+    if(d.sessionStatus==='COMPLETED') {
+      renderSummary(d); show('summaryView');
+    } else {
+      renderReady(d); show('readyView');
+    }
+  } catch(e) {
+    enterRecovery(e);
+  } finally {
+    app.busy=false;
+    $('confirmBtn').disabled=$('absentBtn').disabled=false;
+  }
+}
+
+async function markAbsent() {
+  if(app.busy || !app.pending) return;
+  if(!confirm(app.pending.school+' '+String(app.pending.name).replace(/\(직\)/g,'')+' 교장선생님을 현장 부재 처리하고 같은 경품을 다시 추첨하시겠습니까?\n\n부재 처리된 대상자는 이후 추첨에서도 제외됩니다.')) return;
+  app.busy=true;
+  $('confirmBtn').disabled=$('absentBtn').disabled=true;
+  try {
+    const d=await apiPost('drawAbsent',{pin:app.pin,sessionId:app.sessionId,pendingId:app.pending.pendingId},8000);
+    if(!d.ok) throw new Error(d.message||'부재 처리를 저장하지 못했습니다.');
+    hydrateStatus(d);
+    app.pending=null;
+    renderReady(d);
+    show('readyView');
+    toast('현장 부재 처리되었습니다. 같은 경품을 다시 추첨합니다.');
+  } catch(e) {
+    enterRecovery(e);
+  } finally {
+    app.busy=false;
+    $('confirmBtn').disabled=$('absentBtn').disabled=false;
+  }
+}
+
+function enterRecovery(err) {
+  stopRollingAudio();
+  $('recoveryTitle').textContent='통신 상태를 확인해 주세요';
+  $('recoveryText').textContent='추첨 요청이 서버에서 처리되었을 수도 있습니다. 새 당첨자를 뽑기 전에 서버 상태를 먼저 확인합니다.';
+  $('retryDrawBtn').classList.add('hidden');
+  $('revealPendingBtn').classList.add('hidden');
+  $('statusCheckBtn').classList.remove('hidden');
+  show('recoveryView');
+}
+async function checkRecoveryStatus() {
+  if(app.busy) return;
+  app.busy=true;
+  $('statusCheckBtn').disabled=true;
+  try {
+    const d=await apiPost('drawStatus',{pin:app.pin},8000);
+    if(!d.authorized) throw new Error('관리자 인증에 실패했습니다.');
+    hydrateStatus(d);
+    if(d.pendingWinner) {
+      $('recoveryTitle').textContent='서버에 당첨 결과가 저장되어 있습니다';
+      $('recoveryText').textContent=(d.pendingWinner.prizeNo||d.currentPrizeNo)+'번 경품 당첨 결과를 다시 공개합니다.';
+      $('revealPendingBtn').classList.remove('hidden');
+      $('retryDrawBtn').classList.add('hidden');
+      $('statusCheckBtn').classList.add('hidden');
+    } else if(d.sessionStatus==='COMPLETED') {
+      renderSummary(d); show('summaryView');
+    } else if(d.sessionStatus==='RUNNING') {
+      $('recoveryTitle').textContent='서버 상태를 복구했습니다';
+      $('recoveryText').textContent='현재 서버 상태에 맞는 추첨 화면으로 돌아갈 수 있습니다.';
+      $('retryDrawBtn').classList.remove('hidden');
+      $('revealPendingBtn').classList.add('hidden');
+      $('statusCheckBtn').classList.add('hidden');
+    } else {
+      routeFromStatus(d);
+    }
+  } catch(e) {
+    $('recoveryText').textContent='아직 서버 상태를 확인할 수 없습니다. 네트워크 연결 후 다시 눌러 주세요.';
+  } finally {
+    app.busy=false;
+    $('statusCheckBtn').disabled=false;
+  }
+}
+async function revealRecoveredPending() {
+  if(!app.status?.pendingWinner) return;
+  const w=normalizeCandidate({...app.status.pendingWinner,no:app.status.pendingWinner.memberNo});
+  show('rollingView');
+  $('rollingPrize').textContent=(app.status.pendingWinner.prizeNo||app.status.currentPrizeNo)+'번 경품';
+  $('rollingProgress').textContent=(app.status.currentPrizeNo||1)+' / '+(app.status.targetWinnerCount||0);
+  $('rollingRemain').textContent='결과 복구';
+  $('rollNote').textContent='저장된 당첨 결과를 다시 공개합니다.';
+  const pool=eligibleLocal().concat([w]);
+  for(let i=0;i<4;i++){flashRandom(pool);await sleep(180+i*90)}
+  await landOnWinner(w,pool);
+  showPendingResult(app.status.pendingWinner);
+}
+
+function showRecoveryPending(d) {
+  hydrateStatus(d);
+  $('recoveryTitle').textContent='진행 중인 당첨 결과가 있습니다';
+  $('recoveryText').textContent=(d.pendingWinner.prizeNo||d.currentPrizeNo)+'번 경품은 이미 서버에서 당첨자가 확정되었습니다. 다시 추첨하지 않고 저장된 결과를 공개합니다.';
+  $('statusCheckBtn').classList.add('hidden');
+  $('retryDrawBtn').classList.add('hidden');
+  $('revealPendingBtn').classList.remove('hidden');
+  show('recoveryView');
+}
+
+function renderSummary(d) {
+  hydrateStatus(d);
+  const winners=(d.finalWinners||[]).slice().sort((a,b)=>Number(a.prizeNo)-Number(b.prizeNo));
+  $('summaryEvent').textContent=d.eventName||'';
+  $('summaryConfirmed').textContent=d.confirmedCount ?? winners.length;
+  $('summaryAbsent').textContent=d.absentCount ?? 0;
+  $('summaryAttempts').textContent=(d.allLogs||[]).length || (Number(d.confirmedCount||0)+Number(d.absentCount||0));
+  $('summaryList').innerHTML=winners.map(w=>{
+    const s=schoolFor(w.memberNo ?? w.no);
+    const school=w.school||s.school, name=String(w.name||s.name||'').replace(/\(직\)/g,'').trim();
+    return `<div class="winner-row"><div class="no">${w.prizeNo}번</div><div class="school">${escapeHtml(school)}</div><div class="name">${escapeHtml(name)}</div></div>`;
+  }).join('');
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+function csvDownload(filename, rows) {
+  const csv=rows.map(row=>row.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
+}
+function downloadFinalCsv() {
+  const d=app.status||{};
+  const rows=[['경품번호','학교','성명','추첨시각','확인시각']];
+  (d.finalWinners||[]).sort((a,b)=>a.prizeNo-b.prizeNo).forEach(w=>rows.push([w.prizeNo,w.school,w.name,w.drawnAt||'',w.processedAt||'']));
+  csvDownload('최종당첨자.csv',rows);
+}
+function downloadLogCsv() {
+  const logs=app.status?.allLogs||[];
+  const rows=[['logId','sessionId','경품번호','시도','memberNo','학교','성명','상태','추첨전후보수','선택index','추첨후후보수','추첨시각','처리시각']];
+  logs.forEach(x=>rows.push([x.logId,x.sessionId,x.prizeNo,x.attemptNo,x.memberNo,x.school,x.name,x.status,x.candidateCountBefore,x.selectedIndex,x.candidateCountAfter,x.drawnAt,x.processedAt]));
+  csvDownload('추첨전체기록.csv',rows);
+}
+async function copyWinners() {
+  const lines=(app.status?.finalWinners||[]).sort((a,b)=>a.prizeNo-b.prizeNo).map(w=>`${w.prizeNo}번. ${w.school} ${String(w.name||'').replace(/\(직\)/g,'')} 교장선생님`);
+  const text='[경품 추첨 최종 당첨자]\n'+lines.join('\n');
+  try{await navigator.clipboard.writeText(text);toast('당첨자 명단을 복사했습니다.')}catch(e){window.prompt('복사해 주세요',text)}
+}
+
+function unlockAudioOnce() {
+  // 관리자 PIN 입력(첫 클릭) 시점에 무음으로 한 번 재생/정지해
+  // 이후 실제 추첨 때 브라우저 자동재생 차단 없이 바로 소리가 나오게 한다.
+  try {
+    const p1 = AUDIO.rolling.play();
+    if(p1?.then) p1.then(()=>{AUDIO.rolling.pause();AUDIO.rolling.currentTime=0;}).catch(()=>{});
+    const p2 = AUDIO.fanfare.play();
+    if(p2?.then) p2.then(()=>{AUDIO.fanfare.pause();AUDIO.fanfare.currentTime=0;}).catch(()=>{});
+  } catch(e) {}
+}
+function startRollingAudio() {
+  if(!app.soundOn) return;
+  try{AUDIO.rolling.currentTime=0; const p=AUDIO.rolling.play(); if(p?.catch)p.catch(()=>{})}catch(e){}
+}
+function stopRollingAudio(){try{AUDIO.rolling.pause();AUDIO.rolling.currentTime=0}catch(e){}}
+function playFanfare(){
+  if(!app.soundOn)return;
+  try{AUDIO.fanfare.currentTime=0;const p=AUDIO.fanfare.play();if(p?.catch)p.catch(()=>{})}catch(e){}
+}
+async function testSound() {
+  try {
+    AUDIO.fanfare.currentTime=0;
+    await AUDIO.fanfare.play();
+    setTimeout(()=>{AUDIO.fanfare.pause();AUDIO.fanfare.currentTime=0},1300);
+    toast('효과음을 재생했습니다. 실제 강당 스피커 출력을 확인하세요.');
+  } catch(e) { toast('브라우저에서 음원을 재생하지 못했습니다.'); }
+}
+function updateAudioStatus() {
+  const set=(audio,dot,state)=>{
+    const failed = !!audio.error;
+    const ok = audio.readyState>=2 && !failed;
+    $(dot).className='dot '+(ok?'ok':'bad');
+    $(state).textContent = failed ? '파일 확인 필요' : (ok?'준비됨':'로딩 중');
+  };
+  set(AUDIO.rolling,'rollDot','rollState');set(AUDIO.fanfare,'fanDot','fanState');
+}
+['canplay','canplaythrough','loadeddata','error'].forEach(ev=>{
+  AUDIO.rolling.addEventListener(ev,updateAudioStatus);
+  AUDIO.fanfare.addEventListener(ev,updateAudioStatus);
+});
+
+function burstConfetti() {
+  const c=$('confetti'),ctx=c.getContext('2d');
+  c.width=innerWidth;c.height=innerHeight;
+  const bits=Array.from({length:120},()=>({
+    x:Math.random()*c.width,y:-20-Math.random()*c.height*.25,
+    vx:(Math.random()-.5)*5,vy:3+Math.random()*5,r:4+Math.random()*6,
+    rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.25,
+    hue:[42,48,210,18,0][Math.floor(Math.random()*5)]
+  }));
+  const start=performance.now();
+  function frame(t){
+    ctx.clearRect(0,0,c.width,c.height);
+    bits.forEach(b=>{b.x+=b.vx;b.y+=b.vy;b.vy+=.04;b.rot+=b.vr;
+      ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.rot);ctx.fillStyle=`hsl(${b.hue} 78% 58%)`;ctx.fillRect(-b.r,-b.r/2,b.r*2,b.r);ctx.restore();
+    });
+    if(t-start<2500)requestAnimationFrame(frame);else ctx.clearRect(0,0,c.width,c.height);
+  }
+  requestAnimationFrame(frame);
+}
+
+async function fullscreenToggle(){
+  try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen();}catch(e){toast('브라우저 F11 전체화면을 사용해 주세요.')}
+}
+function toggleAudio() {
+  app.soundOn=!app.soundOn;
+  if(!app.soundOn) stopRollingAudio();
+  $('audioToggleBtn').textContent=app.soundOn?'🔊 효과음 ON':'🔇 효과음 OFF';
+  toast(app.soundOn?'효과음을 켰습니다.':'효과음을 껐습니다.');
+}
+
+$('pinBtn').addEventListener('click',authenticate);
+$('pinInput').addEventListener('keydown',e=>{if(e.key==='Enter')authenticate()});
+$('minusBtn').addEventListener('click',()=>{$('targetInput').value=Number($('targetInput').value)-1;updateTargetUI()});
+$('plusBtn').addEventListener('click',()=>{$('targetInput').value=Number($('targetInput').value)+1;updateTargetUI()});
+$('targetInput').addEventListener('input',updateTargetUI);
+$('refreshSetupBtn').addEventListener('click',refreshSetup);
+$('startBtn').addEventListener('click',startDrawSession);
+$('goReadyBtn').addEventListener('click',()=>{renderReady(app.status);show('readyView')});
+$('drawBtn').addEventListener('click',beginDraw);
+$('confirmBtn').addEventListener('click',confirmWinner);
+$('absentBtn').addEventListener('click',markAbsent);
+$('statusCheckBtn').addEventListener('click',checkRecoveryStatus);
+$('retryDrawBtn').addEventListener('click',()=>{renderReady(app.status);show('readyView')});
+$('revealPendingBtn').addEventListener('click',revealRecoveredPending);
+$('soundTestBtn').addEventListener('click',testSound);
+$('drawerSoundTest').addEventListener('click',testSound);
+$('audioToggleBtn').addEventListener('click',toggleAudio);
+$('fullscreenBtn').addEventListener('click',fullscreenToggle);
+$('copyBtn').addEventListener('click',copyWinners);
+$('finalCsvBtn').addEventListener('click',downloadFinalCsv);
+$('logCsvBtn').addEventListener('click',downloadLogCsv);
+$('gearBtn').addEventListener('click',()=>$('drawer').classList.toggle('hidden'));
+
+document.addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if(app.busy) return;
+  if(e.code==='Space' && app.ui==='READY'){e.preventDefault();beginDraw();return}
+  if(e.key==='Enter' && app.ui==='RESULT'){e.preventDefault();confirmWinner();return}
+  if(e.key.toLowerCase()==='f'){e.preventDefault();fullscreenToggle();return}
+  if(e.key.toLowerCase()==='m'){e.preventDefault();toggleAudio();return}
+});
+
+window.addEventListener('resize',()=>{const c=$('confetti');c.width=innerWidth;c.height=innerHeight});
+setInterval(updateAudioStatus,1000);
+updateAudioStatus();
+publicStatus();
+if(app.pin) $('pinInput').value=app.pin;
+</script>
+</body>
+</html>
