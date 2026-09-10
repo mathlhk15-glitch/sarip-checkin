@@ -634,6 +634,10 @@ async function loadAdmin(){
   renderAdminTable();
 }
 
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function renderAdminTable(){
   const q = norm(document.getElementById('adminSearch').value);
   let list = adminData;
@@ -649,8 +653,8 @@ function renderAdminTable(){
   for(const r of list){
     const row = document.createElement('div');
     row.className = 'admin-row' + (r.checked?' checked':'');
-    const cheer = r.message ? `<div class="r" style="margin-top:2px;color:var(--brass-dark);font-style:italic;">"${r.message}"</div>` : '';
-    row.innerHTML = `<div class="l">${r.school} · ${r.name}${cheer}</div><div class="r">${r.checked ? r.time+' 완료' : '미확인'}</div>`;
+    const cheer = r.message ? `<div class="r" style="margin-top:2px;color:var(--brass-dark);font-style:italic;">"${escapeHtml(r.message)}"</div>` : '';
+    row.innerHTML = `<div class="l">${escapeHtml(r.school)} · ${escapeHtml(r.name)}${cheer}</div><div class="r">${r.checked ? escapeHtml(r.time)+' 완료' : '미확인'}</div>`;
     box.appendChild(row);
   }
 }
