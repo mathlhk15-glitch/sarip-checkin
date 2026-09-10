@@ -184,6 +184,21 @@
     margin-bottom:24px;
   }
   .confirm-q{ font-size:17px; color:var(--ink-2); margin-bottom:22px; }
+  .cheer-wrap{ text-align:left; margin:4px 0 22px; }
+  .cheer-label{ display:block; font-size:14px; color:var(--ink-2); margin-bottom:8px; }
+  #cheerInput{
+    width:100%;
+    font-family:inherit;
+    font-size:16px;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    outline:none;
+    background:#FCFAF4;
+    color:var(--ink);
+    resize:none;
+  }
+  #cheerInput:focus{ border-color:var(--brass); background:#fff; }
   .btnrow{ display:flex; gap:10px; }
   button.primary, button.secondary{
     flex:1;
@@ -292,6 +307,10 @@
       <div class="confirm-q">아래 정보가 맞는지 확인해 주세요</div>
       <div class="big-school" id="cf-school"></div>
       <div class="big-name" id="cf-name"></div>
+      <div class="cheer-wrap">
+        <label class="cheer-label" for="cheerInput">경남사립학교장회에 응원 한마디 (선택)</label>
+        <textarea id="cheerInput" rows="2" maxlength="60" placeholder="예: 늘 응원합니다, 화이팅!"></textarea>
+      </div>
       <div class="btnrow">
         <button class="secondary" id="cf-cancel">다시 찾기</button>
         <button class="primary" id="cf-ok">네, 출석합니다</button>
@@ -418,6 +437,7 @@ function openConfirm(school){
   pending = school;
   document.getElementById('cf-school').textContent = school.school;
   document.getElementById('cf-name').textContent = school.name + ' 교장선생님';
+  document.getElementById('cheerInput').value = '';
   showView('confirm');
 }
 
@@ -428,12 +448,13 @@ document.getElementById('cf-cancel').addEventListener('click', ()=>{
 document.getElementById('cf-ok').addEventListener('click', async ()=>{
   if(!pending) return;
   document.getElementById('cf-ok').disabled = true;
+  const message = document.getElementById('cheerInput').value.trim().slice(0,60);
   let data;
   try{
     const res = await fetch(GAS_URL, {
       method:'POST',
       headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action:'checkin', no:pending.no, school:pending.school, name:pending.name, level:pending.level, region:pending.region })
+      body: JSON.stringify({ action:'checkin', no:pending.no, school:pending.school, name:pending.name, level:pending.level, region:pending.region, message })
     });
     data = await res.json();
   }catch(e){
@@ -566,9 +587,9 @@ function promptFallback(text){
 
 function downloadCsv(){
   if(adminData.length===0){ alert('데이터를 먼저 불러와 주세요.'); return; }
-  const header = ['연번','지역','학교급','교명','성명','출석여부','출석시각'];
+  const header = ['연번','지역','학교급','교명','성명','출석여부','출석시각','응원문구'];
   const rows = [...adminData].sort((a,b)=> a.no-b.no).map(r=>[
-    r.no, r.region, r.level, r.school, r.name, r.checked? '출석':'미확인', r.time||''
+    r.no, r.region, r.level, r.school, r.name, r.checked? '출석':'미확인', r.time||'', r.message||''
   ]);
   const csv = [header, ...rows].map(row =>
     row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
@@ -594,12 +615,15 @@ async function loadAdmin(){
   try{
     const res = await fetch(`${GAS_URL}?action=all`);
     const data = await res.json();
-    (data.records||[]).forEach(r => { recordMap[String(r.no)] = r.time; });
+    (data.records||[]).forEach(r => { recordMap[String(r.no)] = { time:r.time, message:r.message||'' }; });
   }catch(e){
     document.getElementById('adminTable').innerHTML = '<div class="empty">불러오지 못했습니다. 새로고침을 다시 눌러주세요.</div>';
     return;
   }
-  const results = SCHOOLS.map(s => ({ ...s, checked: !!recordMap[String(s.no)], time: recordMap[String(s.no)] || null }));
+  const results = SCHOOLS.map(s => {
+    const rec = recordMap[String(s.no)];
+    return { ...s, checked: !!rec, time: rec ? rec.time : null, message: rec ? rec.message : '' };
+  });
   adminData = results;
   const total = results.length;
   const done = results.filter(r=>r.checked).length;
@@ -625,7 +649,8 @@ function renderAdminTable(){
   for(const r of list){
     const row = document.createElement('div');
     row.className = 'admin-row' + (r.checked?' checked':'');
-    row.innerHTML = `<div class="l">${r.school} · ${r.name}</div><div class="r">${r.checked ? r.time+' 완료' : '미확인'}</div>`;
+    const cheer = r.message ? `<div class="r" style="margin-top:2px;color:var(--brass-dark);font-style:italic;">"${r.message}"</div>` : '';
+    row.innerHTML = `<div class="l">${r.school} · ${r.name}${cheer}</div><div class="r">${r.checked ? r.time+' 완료' : '미확인'}</div>`;
     box.appendChild(row);
   }
 }
